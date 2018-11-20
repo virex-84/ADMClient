@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:defaultValue="@xml/options"
+    android:theme="@style/AppTheme"
+    >
+    <PreferenceCategory android:title="@string/user">
+        <com.virex.admclient.ui.EditSummaryPreference
+            android:title="@string/login" android:key="pref_login"  />
+        <com.virex.admclient.ui.EditSummaryPreference
+            android:title="@string/password" android:key="pref_password" android:password="true"/>
+        <com.virex.admclient.ui.EditSummaryPreference
+            android:title="@string/email" android:key="pref_email" />
+        <com.virex.admclient.ui.EditSummaryPreference
+            android:title="@string/signature" android:key="pref_signature" android:defaultValue="@string/pref_signature"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/decoration">
+        <com.virex.admclient.ui.ColorPickerPreference  android:title="@string/colorPrimary" android:key="pref_colorPrimary"  />
+        <CheckBoxPreference
+            android:checked="true"
+            android:defaultValue="false"
+            android:key="pref_set_dark_theme"
+            android:title="@string/pref_set_dark_theme"
+            />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/additionally">
+        <CheckBoxPreference
+            android:checked="true"
+            android:defaultValue="false"
+            android:key="pref_update_bookmarked_topics"
+            android:title="@string/pref_confirm_update_bookmarked_topics"
+            android:summary="@string/pref_confirm_update_bookmarked_topics"
+            />
+        <Preference android:key="pref_edit_anketa" android:title="@string/pref_edit_anketa"/>
+        <Preference android:key="pref_dbclear" android:title="@string/pref_dbclear"/>
+        <CheckBoxPreference
+            android:checked="true"
+            android:defaultValue="true"
+            android:key="pref_confirm_exit_dialog"
+            android:title="@string/pref_confirm_exit_dialog"
+            android:summary="@string/pref_confirm_exit_dialog"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>

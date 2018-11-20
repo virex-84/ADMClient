@@ -1,0 +1,27 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorEdgeEffect" tools:ignore="NewApi">@color/colorPrimary</item>
+    </style>
+
+    <style name="bookmarkCheckBoxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/bookmark_checkbox</item>
+    </style>
+
+    <style name="bookmarkCheckBoxStyleMenu" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/bookmark_checkbox_menu</item>
+    </style>
+
+    <style name="defaultCheckBoxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
+    </style>
+
+    <style name="MyAlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/colorPrimaryDark</item>
+        <item name="android:windowBackground">@color/colorAccent</item>
+    </style>
+
+</resources>

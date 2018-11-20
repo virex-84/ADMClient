@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_search"
+        android:onClick="onSearchItemClick"
+        android:title="@string/search_text"
+        android:visible="true"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/check_bookmark"
+        android:checkable="true"
+        android:checkboxStyle="@style/bookmarkCheckBoxStyleMenu"
+
+        android:icon="@drawable/bookmark_checkbox_menu"
+
+        app:actionProviderClass="com.virex.admclient.ui.CheckBoxActionProvider"
+        app:showAsAction="always"
+
+        android:title="" />
+    <item
+        android:id="@+id/empty"
+        android:icon="@drawable/ic_menu"
+        android:orderInCategory="101"
+        android:title=""
+        app:showAsAction="always">
+        <menu>
+
+            <item
+                android:id="@+id/options"
+                android:icon="@drawable/ic_settings"
+                android:title="@string/options"
+                app:showAsAction="ifRoom" />
+
+            <item
+                android:id="@+id/about"
+                android:icon="@drawable/ic_about"
+                android:onClick="onAboutItemClick"
+                android:title="@string/about"
+                app:showAsAction="ifRoom" />
+
+        </menu>
+
+    </item>
+</menu>

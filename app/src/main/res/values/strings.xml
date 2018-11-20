@@ -1,0 +1,43 @@
+﻿<resources>
+    <string name="app_name">ADMClient</string>
+    <string name="reply">Reply</string>
+    <string name="quote">Quote</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="exit">Exit</string>
+    <string name="search_text">Insert text</string>
+    <string name="error_empty_text">Text is empty</string>
+    <string name="pref_signature">from ADMClient</string>
+    <string name="pref_edit_anketa">Edit profile</string>
+    <string name="pref_dbclear">Clear database</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="email">E-mail</string>
+    <string name="signature">Signature</string>
+    <string name="user">User</string>
+    <string name="additionally">Additionally</string>
+    <string name="options">Options</string>
+    <string name="empty">empty</string>
+    <string name="exit_dialog_message">Do you really exit?</string>
+    <string name="clear_database_dialog_message">Do you really want to clear the database?</string>
+    <string name="about">About</string>
+    <string name="app_crash_title">Oops… Something wrong…</string>
+    <string name="app_about">Mobile client\nwww.delphimaster.ru</string>
+    <string name="app_about_description">Write reviews on Google Play\nhttps://play.google.com/store/apps/details?id=com.virex.admclient</string>
+    <string name="input_title">Input title</string>
+    <string name="input_text">Input text</string>
+    <string name="setunbookmark_dialog_message">There is marked %d post(s)\nRemove all bookmarks?</string>
+    <string name="action_scroll_to_post">Go to new posts?</string>
+    <string name="pref_show_exit_dialog_message">Confirmation on exit</string>
+    <string name="pref_confirm_exit_dialog">Confirmation on exit</string>
+    <string name="pref_confirm_exit_dialog_message">Ask next time to confirm exit?</string>
+    <string name="pref_confirm_update_bookmarked_topics">Update marked topics in the background (every 15 minutes)</string>
+
+    <string name="default_notification_channel_id">admclient_chanel</string>
+    <string name="topic_is_closed">The thread is closed.</string>
+    <string name="pref_set_dark_theme">Dark theme</string>
+    <string name="decoration">Decoration</string>
+
+    <string name="colorPrimary">Primary color</string>
+
+</resources>

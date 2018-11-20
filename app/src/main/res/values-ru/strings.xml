@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">ADMClient</string>
+    <string name="reply">Ответ</string>
+    <string name="quote">Цитата</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Отмена</string>
+    <string name="exit">Выход</string>
+    <string name="search_text">Введите текст</string>
+    <string name="error_empty_text">Необходимо ввести текст</string>
+    <string name="pref_signature">from ADMClient</string>
+    <string name="pref_edit_anketa">Редактировать анкету</string>
+    <string name="pref_dbclear">Очистить базу данных</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="email">E-mail</string>
+    <string name="signature">Подпись в сообщениях</string>
+    <string name="user">Пользователь</string>
+    <string name="additionally">Дополнительно</string>
+    <string name="options">Настройки</string>
+    <string name="empty">пусто</string>
+    <string name="exit_dialog_message">Вы действительно хотите выйти?</string>
+    <string name="clear_database_dialog_message">Вы действительно хотите очистить базу?</string>
+    <string name="about">О программе</string>
+    <string name="app_crash_title">Упс… Что-то пошло не так…</string>
+    <string name="app_about">Мобильный клиент форума сайта\nwww.delphimaster.ru</string>
+    <string name="app_about_description">Пишите отзывы в Google Play\nhttps://play.google.com/store/apps/details?id=com.virex.admclient</string>
+    <string name="input_title">Введите заголовок</string>
+    <string name="input_text">Введите текст</string>
+    <string name="setunbookmark_dialog_message">В теме отмечено %d пост(a,ов)\nСнять все закладки?</string>
+    <string name="action_scroll_to_post">Перейти к новым постам?</string>
+    <string name="pref_show_exit_dialog_message">Подтверждение при выходе</string>
+    <string name="pref_confirm_exit_dialog">Подтверждение при выходе</string>
+    <string name="pref_confirm_exit_dialog_message">Cпрашивать в следующий раз подтверждение выхода из программы?</string>
+    <string name="pref_confirm_update_bookmarked_topics">Обновлять отмеченные топики в фоновом режиме (каждые 15 минут)</string>
+
+    <string name="default_notification_channel_id">admclient_chanel</string>
+    <string name="topic_is_closed">Ветка закрыта.</string>
+    <string name="pref_set_dark_theme">Тёмная тема</string>
+    <string name="decoration">Оформление</string>
+
+    <string name="colorPrimary">Основной цвет</string>
+
+</resources>
