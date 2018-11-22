@@ -114,14 +114,28 @@ public class TopicsWorker extends Worker {
         if (topic==null) return;
         topic.n=forumID;
         Topic findTopic=database.topicDao().findTopic(topic.n, topic.id);
+
+        //новая ветка, которой еще нет в базе
         if (findTopic==null){
+            //fix запрос на список тем, выдает количество постов в теме без учета нулевого поста
+            //http://www.delphimaster.ru/cgi-bin/client.pl?getnew=lastmod&n=0
+            topic.count=topic.count+1;
+
             topic.lastcount=topic.count;
+
             if (topic.title!=null) topic.findTitle = topic.title.toLowerCase();
             if (topic.dsc!=null) topic.findDsc = topic.dsc.toLowerCase();
             database.topicDao().insert(topic);
+        //обновляем ветку
         } else {
-            if (topic.lastmod>findTopic.lastmod || topic.count>findTopic.count){
+            if (topic.lastmod>findTopic.lastmod){
+
+                //fix запрос на список тем, выдает количество постов в теме без учета нулевого поста
+                //http://www.delphimaster.ru/cgi-bin/client.pl?getnew=lastmod&n=0
+                topic.count=topic.count+1;
+                //ветка еще не скачана/не обновлена, поэтому показываем разницу (count>lastcount)
                 topic.lastcount=findTopic.lastcount;
+
                 topic.isReaded=false;
                 //придется перезаписывать для поиска
                 topic.findTitle = findTopic.findTitle;
