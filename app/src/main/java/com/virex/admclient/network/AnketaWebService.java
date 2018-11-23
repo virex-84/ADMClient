@@ -2,7 +2,10 @@ package com.virex.admclient.network;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
@@ -17,4 +20,12 @@ public interface AnketaWebService {
 
     @GET("/cgi-bin/client.pl")
     Call<ResponseBody>  getAnketa(@Query("anketa") int id);
+
+    @FormUrlEncoded
+    @POST("/cgi-bin/anketa.pl")
+    Call<ResponseBody> checkLogin(
+            @Field(value="login", encoded=true) String login,
+            @Field(value="psw", encoded=true) String password,
+            @Field(value="edit", encoded=true) String edit
+    );
 }

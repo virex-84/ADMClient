@@ -41,12 +41,12 @@ public class MyViewModel extends AndroidViewModel {
 
     //--------------------------------------------------------------------------
     //список топиков(веток)
-    LiveData<PagedList<Topic>> allTopicsListFiltered(int forumID, String title, boolean isOnlyBookMark){
-        return myRepository.getTopicsFilteredList(forumID, title, isOnlyBookMark);
+    LiveData<PagedList<Topic>> allTopicsListFiltered(int forumID, String title, boolean isOnlyBookMark, int limit){
+        return myRepository.getTopicsFilteredList(forumID, title, isOnlyBookMark,limit);
     }
 
-    void setFilterTopicsList(int forumID, String title, boolean isOnlyBookMark){
-        myRepository.setFilterTopicsList(forumID, title, isOnlyBookMark);
+    void setFilterTopicsList(int forumID, String title, boolean isOnlyBookMark, int limit){
+        myRepository.setFilterTopicsList(forumID, title, isOnlyBookMark, limit);
     }
 
     void refreshTopics(int forumID) {

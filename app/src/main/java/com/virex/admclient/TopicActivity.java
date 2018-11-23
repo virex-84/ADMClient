@@ -32,6 +32,7 @@ public class TopicActivity extends BaseAppCompatActivity {
 
     private boolean isOnlyBookMark=false;
     private String filter="";
+    int limit=-1;
 
     ProgressBar progressBar;
     RecyclerView recyclerView;
@@ -122,7 +123,12 @@ public class TopicActivity extends BaseAppCompatActivity {
         adapter.setColors(getResources().getColor(R.color.white),colorAccent,colorAccent);
         recyclerView.setAdapter(adapter);
 
-        model.allTopicsListFiltered(forumID,filter,isOnlyBookMark).observe(this, new Observer<PagedList<Topic>>() {
+        String pref_topics_limit=options.getString("pref_topics_limit","-1");
+        try {
+            limit = Integer.parseInt(pref_topics_limit);
+        } catch(Exception ignore){
+        }
+        model.allTopicsListFiltered(forumID,filter,isOnlyBookMark,limit).observe(this, new Observer<PagedList<Topic>>() {
             @Override
             public void onChanged(@Nullable PagedList<Topic> topics) {
                 adapter.submitList(topics);
@@ -191,6 +197,19 @@ public class TopicActivity extends BaseAppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        int new_limit=-1;
+        String pref_topics_limit=options.getString("pref_topics_limit","-1");
+        try {
+            new_limit = Integer.parseInt(pref_topics_limit);
+        } catch(Exception ignore){
+        }
+        if (limit!=new_limit) recreate();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //сохраняем позицию списка
@@ -199,7 +218,7 @@ public class TopicActivity extends BaseAppCompatActivity {
 
     //обновление списка (указали фильтр)
     private void refreshDataSource(){
-        model.setFilterTopicsList(forumID,filter,isOnlyBookMark);
+        model.setFilterTopicsList(forumID,filter,isOnlyBookMark, limit);
         //помечаем фильтр для выделения текста в адаптере
         adapter.markText(filter);
         //принудительная перерисовка recycleview

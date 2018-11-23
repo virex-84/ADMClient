@@ -3,15 +3,38 @@ package com.virex.admclient;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.AppCompatImageView;
+import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.virex.admclient.repository.MyRepository;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.virex.admclient.Utils.URLEncodeString;
 
 //import android.support.v14.preference.PreferenceFragment;
 
@@ -30,6 +53,7 @@ public class OptionsActivity extends PreferenceActivity
 
     public static class MyPreferenceFragment extends PreferenceFragment
     {
+
         @Override
         public void onCreate(final Bundle savedInstanceState)
         {
@@ -77,7 +101,89 @@ public class OptionsActivity extends PreferenceActivity
                 alertDialog.show();
             }
 
+            if (preference.getKey().equals("pref_check_login")){
+                String pref_login= getPreferenceManager().getSharedPreferences().getString("pref_login","");
+                String pref_password=getPreferenceManager().getSharedPreferences().getString("pref_password","");
+                String login=URLEncodeString(pref_login);
+                String password=URLEncodeString(pref_password);
+                String edit=URLEncodeString("Редактировать");
+                ((App)getActivity().getApplication()).getAnketaApi().checkLogin(login,password,edit).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            try {
+                                BufferedReader br = new BufferedReader(new InputStreamReader(response.body().byteStream(), "windows-1251"));
+                                String line;
+
+                                //в теге pre обычно есть сообщение об ошибке
+                                while ((line = br.readLine()) != null) {
+                                    String pre = Utils.extractHTMLTag("pre",line);
+                                    String h4 = Utils.extractHTMLTag("H4",line);
+
+                                    if (!TextUtils.isEmpty(pre)){
+                                        //ошибка
+                                        showToast(getActivity().getApplicationContext(), pre,false);
+                                        return;
+                                    }
+
+                                    if (!TextUtils.isEmpty(h4)){
+                                        if (h4.toLowerCase().contains("Редактирование анкеты".toLowerCase())) {
+                                            //зашли в редактирование
+                                            showToast(getActivity().getApplicationContext(), getString(R.string.check_login_sucess),true);
+                                            return;
+                                        }
+                                    }
+                                    /*
+                                    String title = Utils.extractHTMLTag("title",line);
+                                    if (!TextUtils.isEmpty(title)){
+                                        if (title.toLowerCase().contains("Error !".toLowerCase())) {
+                                            //ошибка
+
+                                        }
+                                    }
+                                    */
+                                }
+                            } catch (IOException e) {
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        showToast(getActivity().getApplicationContext(), getString(R.string.check_login_failure),false);
+                    }
+                });
+            }
+
             return super.onPreferenceTreeClick(preferenceScreen, preference);
         }
+
+        public static void showToast(Context context, String text, boolean isSuccess) {
+            /*
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View layout = inflater.inflate(R.layout.toast_message, null);
+
+            ImageView toast_image = layout.findViewById(R.id.toast_image);
+            if (isSuccess){
+                toast_image.setImageResource(R.drawable.ic_done);
+            } else {
+                toast_image.setImageResource(R.drawable.ic_error);
+            }
+
+            TextView toast_text = layout.findViewById(R.id.toast_text);
+            toast_text.setText(text);
+
+            Toast toast = new Toast(context);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.setView(layout);
+            toast.show();
+            */
+
+            Toast toast = Toast.makeText(context,text, Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
     }
+
 }

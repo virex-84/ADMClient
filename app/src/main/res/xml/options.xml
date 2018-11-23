@@ -13,6 +13,7 @@
             android:title="@string/email" android:key="pref_email" />
         <com.virex.admclient.ui.EditSummaryPreference
             android:title="@string/signature" android:key="pref_signature" android:defaultValue="@string/pref_signature"/>
+        <Preference android:title="@string/check_login" android:key="pref_check_login"  />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/decoration">
         <com.virex.admclient.ui.ColorPickerPreference  android:title="@string/colorPrimary" android:key="pref_colorPrimary"  />
@@ -24,6 +25,11 @@
             />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/additionally">
+        <ListPreference
+            android:key="pref_topics_limit"
+            android:title="@string/pref_topics_limit"
+            android:entries="@array/topic_limit"
+            android:entryValues="@array/topic_limit"/>
         <CheckBoxPreference
             android:checked="true"
             android:defaultValue="false"

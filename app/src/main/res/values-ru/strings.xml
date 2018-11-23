@@ -39,5 +39,10 @@
     <string name="decoration">Оформление</string>
 
     <string name="colorPrimary">Основной цвет</string>
+    <string name="check_login">Проверить логин</string>
+    <string name="check_login_failure">Ошибка проверки логина</string>
+    <string name="check_login_sucess">Логин подтвержден</string>
+    <string name="no_limit">Без ограничений</string>
+    <string name="pref_topics_limit">Количество отображаемых топиков</string>
 
 </resources>

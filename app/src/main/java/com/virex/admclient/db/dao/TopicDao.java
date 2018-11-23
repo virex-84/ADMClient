@@ -47,6 +47,10 @@ public interface TopicDao {
     @Query("SELECT * FROM topic WHERE forum_id==:forum_id and (findTitle LIKE LOWER('%' || :text || '%') or findDsc LIKE LOWER('%' || :text || '%') ) AND cast(isBookMark as varchar(1)) like (CASE :isOnlyBookMark WHEN 0 THEN '%' WHEN 1 THEN '1' END) ORDER BY lastmod DESC" )
     DataSource.Factory<Integer, Topic> topicsDataSourceFiltered(int forum_id, String text, boolean isOnlyBookMark);
 
+    @Transaction
+    @Query("SELECT * FROM topic WHERE forum_id==:forum_id and (findTitle LIKE LOWER('%' || :text || '%') or findDsc LIKE LOWER('%' || :text || '%') ) AND cast(isBookMark as varchar(1)) like (CASE :isOnlyBookMark WHEN 0 THEN '%' WHEN 1 THEN '1' END) ORDER BY lastmod DESC LIMIT :limit" )
+    DataSource.Factory<Integer, Topic> topicsDataSourceFiltered(int forum_id, String text, boolean isOnlyBookMark, int limit);
+
 
     @Query("UPDATE topic SET isBookMark = not isBookMark WHERE id == :topic_id and forum_id==:forum_id")
     int changeBookMark(int forum_id, int topic_id);

@@ -101,7 +101,7 @@ public class MyRepository {
     }
 
     //--------------------------------------------------------------------------
-    private LiveData<PagedList<Topic>> createFilteredTopics(final int forumID, String title, boolean isOnlyBookMark) {
+    private LiveData<PagedList<Topic>> createFilteredTopics(final int forumID, String title, boolean isOnlyBookMark, int limit) {
         LiveData<PagedList<Topic>> PagedListLiveData=null;
 
         PagedList.Config config = new PagedList.Config.Builder()
@@ -109,7 +109,12 @@ public class MyRepository {
                 .setPageSize(10)
                 .build();
 
-        DataSource.Factory<Integer, Topic> convert =database.topicDao().topicsDataSourceFiltered(forumID, title,isOnlyBookMark);
+        DataSource.Factory<Integer, Topic> convert;
+        if (limit>0){
+            convert = database.topicDao().topicsDataSourceFiltered(forumID, title, isOnlyBookMark, limit);
+        } else {
+            convert = database.topicDao().topicsDataSourceFiltered(forumID, title, isOnlyBookMark);
+        }
 
         PagedListLiveData = new LivePagedListBuilder<>(convert, config)
                 .setFetchExecutor(Executors.newSingleThreadExecutor())
@@ -126,15 +131,15 @@ public class MyRepository {
         return  PagedListLiveData;
     }
 
-    public LiveData<PagedList<Topic>> getTopicsFilteredList(int forumID, String title, boolean isOnlyBookMark){
-        setFilterTopicsList(forumID, title, isOnlyBookMark);
+    public LiveData<PagedList<Topic>> getTopicsFilteredList(int forumID, String title, boolean isOnlyBookMark, int limit){
+        setFilterTopicsList(forumID, title, isOnlyBookMark, limit);
         return filteredTopics;
     }
 
 
-    public void setFilterTopicsList(int forumID, final String title, boolean isOnlyBookMark){
+    public void setFilterTopicsList(int forumID, final String title, boolean isOnlyBookMark, int limit){
         filteredTopics.removeSource(topics);
-        topics=createFilteredTopics(forumID, title, isOnlyBookMark);
+        topics=createFilteredTopics(forumID, title, isOnlyBookMark, limit);
 
         filteredTopics.addSource(topics, new Observer<PagedList<Topic>>() {
             @Override
@@ -357,7 +362,6 @@ public class MyRepository {
                     } catch (IOException e) {
                         if (onPostCallback!=null) {
                             onPostCallback.onError(e.getMessage());
-                            return;
                         }
                     }
                 }
@@ -367,7 +371,6 @@ public class MyRepository {
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 if (onPostCallback!=null) {
                     onPostCallback.onError(t.getMessage());
-                    return;
                 }
             }
         });
