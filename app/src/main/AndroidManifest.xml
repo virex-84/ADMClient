@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".TopicActivity" />
-        <activity android:name=".PageActivity">
+        <activity android:name=".PageActivity" android:configChanges="screenSize|orientation">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />

@@ -49,8 +49,6 @@ public class PageActivity extends BaseAppCompatActivity {
     private String SHARED_OPTIONS;//
     private String SHARED_RECYCLER_POSITION = "SHARED_RECYCLER_POSITION";
 
-    LinearLayoutManager.SavedState position;
-
     PostPageDialog postPageDialog;
 
     Snackbar snackbar;
@@ -187,7 +185,7 @@ public class PageActivity extends BaseAppCompatActivity {
 
             @Override
             public void onBookMarkClick(Page page, int position) {
-                savePosition();
+                savePositionPreference();
                 model.changePageBookmark(page);
             }
         });
@@ -209,9 +207,6 @@ public class PageActivity extends BaseAppCompatActivity {
                 }
             }
         });
-
-        //возвращаем позицию при открытии Acivity/смены положения экрана
-        restorePositionPreference();
 
         model.allPagesListFiltered(forumID,topicID,filter,isOnlyBookMark).observe(this, new Observer<PagedList<Page>>() {
             @Override
@@ -236,15 +231,14 @@ public class PageActivity extends BaseAppCompatActivity {
 
 
                 //возвращаем позицию после обновления данных (например после фильтра)
-                restorePosition();
+                restorePositionPreference();
                 //небольшой "фикс"
                 //при загрузке данных, позиция уже на 100 посте и выше изменяется
                 //поэтому приходится еще раз вызвать восстановление позиции
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        restorePosition();
-                        position=null;
+                        restorePositionPreference();
                         scrolltoLast();
                     }
                 }, 1);
@@ -301,17 +295,7 @@ public class PageActivity extends BaseAppCompatActivity {
     private void restorePositionPreference(){
         SharedPreferences settings = getSharedPreferences(SHARED_OPTIONS, MODE_PRIVATE);
         String pos = settings.getString(SHARED_RECYCLER_POSITION, "");
-        position =new Gson().fromJson(pos, LinearLayoutManager.SavedState.class);
-        restorePosition();
-    }
-
-    //сохранение позиции списка
-    private void savePosition(){
-        position= (LinearLayoutManager.SavedState) recyclerView.getLayoutManager().onSaveInstanceState();
-    }
-
-    //восстановление позиции списка
-    private void restorePosition(){
+        LinearLayoutManager.SavedState position =new Gson().fromJson(pos, LinearLayoutManager.SavedState.class);
         recyclerView.getLayoutManager().onRestoreInstanceState(position);
     }
 
@@ -341,7 +325,8 @@ public class PageActivity extends BaseAppCompatActivity {
     void scrolltoLast(){
         if (postedNow && adapter.getItemCount()>0) {
             postedNow=false;
-            recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+            //recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+            ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(adapter.getItemCount() - 1,0);
         }
     }
 
