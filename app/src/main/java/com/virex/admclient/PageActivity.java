@@ -68,6 +68,7 @@ public class PageActivity extends BaseAppCompatActivity {
         //отображаем меню поиска и фильтр по признаку "закладка"
         showSearchMenuItem=true;
         showBookmarkMenuItem=true;
+        showGoUpDownMenuItem=true;
 
         forumID = getIntent().getIntExtra("n",-1);
         topicID = getIntent().getIntExtra("id",-1);
@@ -214,7 +215,7 @@ public class PageActivity extends BaseAppCompatActivity {
                 }
 
                 //прогресс чтения
-                progressBarRead.setProgress(linearLayoutManager.findLastVisibleItemPosition());
+                updateProgressBar();
 
                 //скрываем прогресс когда список постов не скроллируют
                 switch (newState){
@@ -264,7 +265,7 @@ public class PageActivity extends BaseAppCompatActivity {
                         scrolltoLast();
                         //fix при первом открытии activity ожидаем когда восстановится linearLayoutManager
                         //и тогда можно определить прогресс
-                        progressBarRead.setProgress(linearLayoutManager.findLastVisibleItemPosition());
+                        updateProgressBar();
                     }
                 }, 1);
 
@@ -369,5 +370,21 @@ public class PageActivity extends BaseAppCompatActivity {
         return "<i>".concat(quoteLines).concat("</i>").concat(text);
     }
 
+    private void updateProgressBar(){
+        progressBarRead.setProgress(linearLayoutManager.findLastVisibleItemPosition());
+    }
 
+    @Override
+    public void onGoUp() {
+        linearLayoutManager.scrollToPositionWithOffset(0,0);
+        //fix updateProgressBar не актуален, linearLayoutManager.findLastVisibleItemPosition() еще не знает об изменениях
+        progressBarRead.setProgress(0);
+    }
+
+    @Override
+    public void onGoBottom() {
+        linearLayoutManager.scrollToPositionWithOffset(adapter.getItemCount() - 1,0);
+        //fix updateProgressBar не актуален, linearLayoutManager.findLastVisibleItemPosition() еще не знает об изменениях
+        progressBarRead.setProgress(adapter.getItemCount() - 1);
+    }
 }

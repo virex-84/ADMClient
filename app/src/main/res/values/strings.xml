@@ -45,6 +45,9 @@
     <string name="no_limit">No limit</string>
     <string name="pref_topics_limit">No limits</string>
 
+    <string name="scroll_to_up">Scroll up</string>
+    <string name="scroll_to_bottom">Scroll bottom</string>
+
     <string-array name="topic_limit">
         <item>@string/no_limit</item>
         <item>10</item>

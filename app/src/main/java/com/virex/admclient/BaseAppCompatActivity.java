@@ -36,6 +36,7 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     SearchView searchView;
     public boolean showSearchMenuItem=false;
     public boolean showBookmarkMenuItem=false;
+    public boolean showGoUpDownMenuItem=false;
     public SharedPreferences options;
 
     int last_pref_colorPrimary=-1;
@@ -98,6 +99,28 @@ public class BaseAppCompatActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(boolean isChecked) {
                 onBookmarkCheck(isChecked);
+            }
+        });
+
+        //меню перехода на первый пост
+        MenuItem goUp = menu.findItem(R.id.goUp);
+        goUp.setVisible(showGoUpDownMenuItem);
+        goUp.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                onGoUp();
+                return false;
+            }
+        });
+
+        //меню перехода на последний пост
+        MenuItem goBottom = menu.findItem(R.id.goBottom);
+        goBottom.setVisible(showGoUpDownMenuItem);
+        goBottom.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                onGoBottom();
+                return false;
             }
         });
 
@@ -250,6 +273,12 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     }
 
     public void onBookmarkCheck(boolean checked){
+    }
+
+    public void onGoUp(){
+    }
+
+    public void onGoBottom(){
     }
 
     /*

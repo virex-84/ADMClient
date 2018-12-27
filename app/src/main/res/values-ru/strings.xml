@@ -45,4 +45,7 @@
     <string name="no_limit">Без ограничений</string>
     <string name="pref_topics_limit">Количество отображаемых топиков</string>
 
+    <string name="scroll_to_up">Перейти в начало</string>
+    <string name="scroll_to_bottom">Перейти к концу</string>
+
 </resources>
