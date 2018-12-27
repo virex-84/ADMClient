@@ -44,7 +44,9 @@ public class PageActivity extends BaseAppCompatActivity {
 
     PagesAdapter adapter;
     RecyclerView recyclerView;
+    LinearLayoutManager linearLayoutManager;
     ProgressBar progressBar;
+    ProgressBar progressBarRead;
 
     private String SHARED_OPTIONS;//
     private String SHARED_RECYCLER_POSITION = "SHARED_RECYCLER_POSITION";
@@ -75,9 +77,14 @@ public class PageActivity extends BaseAppCompatActivity {
         model = ViewModelProviders.of(this).get(MyViewModel.class);
 
         progressBar = findViewById(R.id.progressBar);
+        progressBarRead = findViewById(R.id.progressBarRead);
         recyclerView = findViewById(R.id.tv_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        linearLayoutManager=new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
         swipeRefreshLayout = findViewById(R.id.swipe_container);
+
+        //окрашиваем прогрессбар в основной цвет
+        progressBarRead.getProgressDrawable().setColorFilter(colorAccent, android.graphics.PorterDuff.Mode.SRC_IN);
 
         //обновление по свайпу вниз/вверх
         swipeRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
@@ -205,6 +212,20 @@ public class PageActivity extends BaseAppCompatActivity {
                     snackbar.dismiss();
                     snackbar=null;
                 }
+
+                //прогресс чтения
+                progressBarRead.setProgress(linearLayoutManager.findLastVisibleItemPosition());
+
+                //скрываем прогресс когда список постов не скроллируют
+                switch (newState){
+                    case RecyclerView.SCROLL_STATE_SETTLING:
+                    case RecyclerView.SCROLL_STATE_DRAGGING:
+                        progressBarRead.setVisibility(View.VISIBLE);
+                        break;
+                    case RecyclerView.SCROLL_STATE_IDLE:
+                        progressBarRead.setVisibility(View.INVISIBLE);
+                        break;
+                }
             }
         });
 
@@ -227,8 +248,9 @@ public class PageActivity extends BaseAppCompatActivity {
                         progressBar.setVisibility(View.GONE);
                     } else
                         progressBar.setVisibility(View.VISIBLE);
-                }
 
+                    progressBarRead.setMax(pages.size()-1);
+                }
 
                 //возвращаем позицию после обновления данных (например после фильтра)
                 restorePositionPreference();
@@ -240,6 +262,9 @@ public class PageActivity extends BaseAppCompatActivity {
                     public void run() {
                         restorePositionPreference();
                         scrolltoLast();
+                        //fix при первом открытии activity ожидаем когда восстановится linearLayoutManager
+                        //и тогда можно определить прогресс
+                        progressBarRead.setProgress(linearLayoutManager.findLastVisibleItemPosition());
                     }
                 }, 1);
 
@@ -284,7 +309,7 @@ public class PageActivity extends BaseAppCompatActivity {
 
     //сохраняем позицию при закрытии Activity
     private void savePositionPreference(){
-        String pos=new Gson().toJson(recyclerView.getLayoutManager().onSaveInstanceState());
+        String pos=new Gson().toJson(linearLayoutManager.onSaveInstanceState());
         SharedPreferences settings = getSharedPreferences(SHARED_OPTIONS, MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(SHARED_RECYCLER_POSITION, pos);
@@ -296,7 +321,7 @@ public class PageActivity extends BaseAppCompatActivity {
         SharedPreferences settings = getSharedPreferences(SHARED_OPTIONS, MODE_PRIVATE);
         String pos = settings.getString(SHARED_RECYCLER_POSITION, "");
         LinearLayoutManager.SavedState position =new Gson().fromJson(pos, LinearLayoutManager.SavedState.class);
-        recyclerView.getLayoutManager().onRestoreInstanceState(position);
+        linearLayoutManager.onRestoreInstanceState(position);
     }
 
     //обновление списка (указали фильтр)
@@ -326,7 +351,7 @@ public class PageActivity extends BaseAppCompatActivity {
         if (postedNow && adapter.getItemCount()>0) {
             postedNow=false;
             //recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
-            ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(adapter.getItemCount() - 1,0);
+            linearLayoutManager.scrollToPositionWithOffset(adapter.getItemCount() - 1,0);
         }
     }
 
