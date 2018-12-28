@@ -3,24 +3,25 @@ package com.virex.admclient;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.support.v4.content.res.ResourcesCompat;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.AppCompatCheckBox;
+import android.support.v7.widget.AppCompatCheckedTextView;
+import android.support.v7.widget.AppCompatEditText;
+import android.support.v7.widget.AppCompatRadioButton;
+import android.support.v7.widget.AppCompatSpinner;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
+import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.virex.admclient.repository.MyRepository;
@@ -36,8 +37,6 @@ import retrofit2.Response;
 
 import static com.virex.admclient.Utils.URLEncodeString;
 
-//import android.support.v14.preference.PreferenceFragment;
-
 
 /**
  * Класс настроек
@@ -48,7 +47,39 @@ public class OptionsActivity extends PreferenceActivity
     protected void onCreate(final Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        //устанавливаем текущую тему (с актуальным colorPrimary)
+        Utils.setColoredTheme(this);
         getFragmentManager().beginTransaction().replace(android.R.id.content,  new MyPreferenceFragment()).commit();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+
+        final View result = super.onCreateView(name, context, attrs);
+        if (result != null) {
+            return result;
+        }
+
+        //создаем элементы AppCompat
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            switch (name) {
+                case "TextView":
+                    return new AppCompatTextView(this, attrs);
+                case "EditText":
+                    return new AppCompatEditText(this, attrs);
+                case "Spinner":
+                    return new AppCompatSpinner(this, attrs);
+                case "CheckBox":
+                    return new AppCompatCheckBox(this, attrs);
+                case "RadioButton":
+                    return new AppCompatRadioButton(this, attrs);
+                case "CheckedTextView":
+                    return new AppCompatCheckedTextView(this, attrs);
+            }
+        }
+
+        return null;
     }
 
     public static class MyPreferenceFragment extends PreferenceFragment
@@ -97,7 +128,7 @@ public class OptionsActivity extends PreferenceActivity
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                             }
-                });
+                        });
                 alertDialog.show();
             }
 
@@ -145,6 +176,10 @@ public class OptionsActivity extends PreferenceActivity
                                 }
                             } catch (IOException e) {
                             }
+                        } else {
+                            String text= getString(R.string.check_login_failure);
+                            text=String.format("%s: [%d] %s",text,response.code(), response.message());
+                            showToast(getActivity().getApplicationContext(),text,true);
                         }
                     }
 

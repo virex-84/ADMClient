@@ -32,18 +32,21 @@
             <item
                 android:id="@+id/goUp"
                 android:icon="@drawable/ic_go_up"
+                app:iconTint="?attr/colorPrimary"
                 android:title="@string/scroll_to_up"
                 app:showAsAction="ifRoom" />
 
             <item
                 android:id="@+id/goBottom"
                 android:icon="@drawable/ic_go_bottom"
+                app:iconTint="?attr/colorPrimary"
                 android:title="@string/scroll_to_bottom"
                 app:showAsAction="ifRoom" />
 
             <item
                 android:id="@+id/options"
                 android:icon="@drawable/ic_settings"
+                app:iconTint="?attr/colorPrimary"
                 android:title="@string/options"
                 app:showAsAction="ifRoom" />
 
@@ -51,6 +54,7 @@
                 android:id="@+id/about"
                 android:icon="@drawable/ic_about"
                 android:onClick="onAboutItemClick"
+                app:iconTint="?attr/colorPrimary"
                 android:title="@string/about"
                 app:showAsAction="ifRoom" />
 
