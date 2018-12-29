@@ -3,25 +3,14 @@ package com.virex.admclient;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AppCompatCheckBox;
-import android.support.v7.widget.AppCompatCheckedTextView;
-import android.support.v7.widget.AppCompatEditText;
-import android.support.v7.widget.AppCompatRadioButton;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceFragmentCompat;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Toast;
 
 import com.virex.admclient.repository.MyRepository;
@@ -41,66 +30,31 @@ import static com.virex.admclient.Utils.URLEncodeString;
 /**
  * Класс настроек
  */
-public class OptionsActivity extends PreferenceActivity
+public class OptionsActivity extends AppCompatActivity
 {
+
     @Override
     protected void onCreate(final Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         //устанавливаем текущую тему (с актуальным colorPrimary)
         Utils.setColoredTheme(this);
-        getFragmentManager().beginTransaction().replace(android.R.id.content,  new MyPreferenceFragment()).commit();
+        //форма
+        setContentView(R.layout.activity_options);
+        //содержимое
+        getSupportFragmentManager().beginTransaction().replace(android.R.id.content,  new MyPreferenceFragment()).commit();
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(String name, Context context, AttributeSet attrs) {
-
-        final View result = super.onCreateView(name, context, attrs);
-        if (result != null) {
-            return result;
-        }
-
-        //создаем элементы AppCompat
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            switch (name) {
-                case "TextView":
-                    return new AppCompatTextView(this, attrs);
-                case "EditText":
-                    return new AppCompatEditText(this, attrs);
-                case "Spinner":
-                    return new AppCompatSpinner(this, attrs);
-                case "CheckBox":
-                    return new AppCompatCheckBox(this, attrs);
-                case "RadioButton":
-                    return new AppCompatRadioButton(this, attrs);
-                case "CheckedTextView":
-                    return new AppCompatCheckedTextView(this, attrs);
-            }
-        }
-
-        return null;
-    }
-
-    public static class MyPreferenceFragment extends PreferenceFragment
+    public static class MyPreferenceFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener
     {
 
         @Override
-        public void onCreate(final Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle bundle, String s) {
             addPreferencesFromResource(R.xml.options);
         }
 
-        /*
         @Override
-        public void onCreatePreferences(Bundle bundle, String s) {
-
-        }
-        */
-
-        @Override
-        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        public boolean onPreferenceTreeClick(android.support.v7.preference.Preference preference) {
 
             //редактирование анкеты
             if (preference.getKey().equals("pref_edit_anketa")){
@@ -179,7 +133,7 @@ public class OptionsActivity extends PreferenceActivity
                         } else {
                             String text= getString(R.string.check_login_failure);
                             text=String.format("%s: [%d] %s",text,response.code(), response.message());
-                            showToast(getActivity().getApplicationContext(),text,true);
+                            showToast(getActivity().getApplicationContext(),text,false);
                         }
                     }
 
@@ -190,19 +144,61 @@ public class OptionsActivity extends PreferenceActivity
                 });
             }
 
-            return super.onPreferenceTreeClick(preferenceScreen, preference);
+            return super.onPreferenceTreeClick(preference);
         }
 
-        public static void showToast(Context context, String text, boolean isSuccess) {
-            /*
+        @Override
+        public void onResume() {
+            super.onResume();
+            // Set up a listener whenever a key changes
+            getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            // Set up a listener whenever a key changes
+            getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (key.equals("pref_colorPrimary")){
+                this.getActivity().recreate();
+            }
+            if (key.equals("pref_set_dark_theme")){
+                this.getActivity().recreate();
+            }
+        }
+
+        public void showToast(Context context, String text, boolean isSuccess) {
+
+/*
+
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View layout = inflater.inflate(R.layout.toast_message, null);
 
             ImageView toast_image = layout.findViewById(R.id.toast_image);
+
+            Drawable drawable;
             if (isSuccess){
-                toast_image.setImageResource(R.drawable.ic_done);
+                //!!! R.drawable.ic_done должен быть без android:tint="?attr/colorPrimary"
+                drawable = AppCompatResources.getDrawable(context, R.drawable.ic_done);
+
+                //DrawableCompat.setTint(drawable, R.color.colorAccent);
+                //toast_image.setImageDrawable(drawable);
+                //toast_image.setImageResource(R.drawable.ic_done);
+                //toast_image.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_done));
+                //toast_image.setImageDrawable(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_bookmark,null));
             } else {
-                toast_image.setImageResource(R.drawable.ic_error);
+                //toast_image.setImageResource(R.drawable.ic_error);
+                drawable = AppCompatResources.getDrawable(context, R.drawable.ic_error);
+            }
+
+            //int colorAccent= Utils.getColorByAttributeId(context,R.attr.colorAccent);
+            if (drawable!=null) {
+                //drawable.mutate().setColorFilter(colorAccent, PorterDuff.Mode.SRC_IN);
+                toast_image.setImageDrawable(drawable);
             }
 
             TextView toast_text = layout.findViewById(R.id.toast_text);
@@ -213,11 +209,12 @@ public class OptionsActivity extends PreferenceActivity
             toast.setDuration(Toast.LENGTH_SHORT);
             toast.setView(layout);
             toast.show();
-            */
+*/
 
             Toast toast = Toast.makeText(context,text, Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
+
         }
     }
 

@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.preference.Preference;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.SeekBar;
@@ -16,7 +16,7 @@ import com.virex.admclient.R;
 import com.virex.admclient.Utils;
 
 
-public class ColorPickerPreference extends Preference implements SeekBar.OnSeekBarChangeListener {
+public class ColorPickerPreference extends android.support.v7.preference.Preference implements SeekBar.OnSeekBarChangeListener {
 
     private int value;
     private ConstraintLayout color_picker_preview;
@@ -50,12 +50,11 @@ public class ColorPickerPreference extends Preference implements SeekBar.OnSeekB
         value=context.getResources().getColor(R.color.colorPrimary);
     }
 
-    @SuppressLint("ResourceAsColor")
     @Override
-    protected void onBindView(View view) {
-        super.onBindView(view);
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
 
-        final View box = view.findViewById(R.id.color_picker_box);
+        final View box = holder.findViewById(R.id.color_picker_box);
         if (box != null) {
             box.setBackgroundColor(value);
         }

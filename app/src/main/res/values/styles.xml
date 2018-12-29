@@ -5,6 +5,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorEdgeEffect" tools:ignore="NewApi">@color/colorPrimary</item>
+        <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
 
     <style name="bookmarkCheckBoxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
@@ -22,6 +23,23 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorBackground">@color/colorPrimaryDark</item>
         <item name="android:windowBackground">@color/colorAccent</item>
+    </style>
+
+    <style name="PreferenceStyle" parent="@style/PreferenceThemeOverlay.v14.Material">
+        <item name="preferenceCategoryStyle">@style/CustomPreferenceCategory</item>
+    </style>
+
+    <style name="CustomPreferenceCategory" parent="@style/Preference.Category">
+        <item name="android:layout">@layout/custom_preference_category</item>
+        <item name="allowDividerAbove">true</item>
+        <item name="allowDividerBelow">true</item>
+    </style>
+
+    <style name="CustomPreferenceCategoryText" parent="@android:style/Widget.TextView">
+        <!-- Style your PreferenceCategory here. -->
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textStyle">bold</item>
+
     </style>
 
 </resources>

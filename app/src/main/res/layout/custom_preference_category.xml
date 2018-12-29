@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@android:id/title"
+        style="@style/CustomPreferenceCategoryText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8sp"
+        android:layout_marginLeft="8dp"
+        android:text="@string/error_empty_text"
+        android:textSize="20sp"
+        app:textAllCaps="true"
+        android:layout_marginStart="8dp" />
+</LinearLayout>
