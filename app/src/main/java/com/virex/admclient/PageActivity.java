@@ -202,6 +202,8 @@ public class PageActivity extends BaseAppCompatActivity {
                 model.getPost(forumID,topicID,position).observe(self, new Observer<Page>() {
                     @Override
                     public void onChanged(@Nullable Page page) {
+                        if (page==null) return;
+
                         postPageDialog =new PostPageDialog(page.author, page.parcedContent.trim(), page.num, new PostPageDialog.OnDialogClickListener() {
                             @Override
                             public void onOkClick(String citate, String text) {
