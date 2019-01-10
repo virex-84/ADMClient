@@ -286,6 +286,7 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
 
     }
 
+    /*
     @Override
     public Resources getResources() {
         //return super.getResources();
@@ -294,7 +295,7 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
         }
         return resources;
     }
-
+    */
 
 
 
