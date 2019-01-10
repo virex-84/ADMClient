@@ -10,8 +10,12 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Space;
 import android.widget.TextView;
 
 import com.virex.admclient.R;
@@ -32,17 +36,22 @@ public class PostPageDialog extends DialogFragment {
     private TextView tv_text;
     private TextView tv_error;
     private TextView tv_position;
+    private LinearLayout ll_reply_to;
     private ProgressBar progressBar;
     String author;
     String citate;
     int position;
-
+    boolean isOnlyPreview=false;
 
     public PostPageDialog(String author, String citate, int position, OnDialogClickListener onDialogClickListener){
         this.onDialogClickListener = onDialogClickListener;
         this.author=author;
         this.citate=citate;
         this.position=position;
+    }
+
+    public void setOnlyPreview(boolean isOnlyPreview){
+        this.isOnlyPreview=isOnlyPreview;
     }
 
     @NonNull
@@ -54,6 +63,7 @@ public class PostPageDialog extends DialogFragment {
         tv_text = rootview.findViewById(R.id.tv_text);
         tv_error = rootview.findViewById(R.id.tv_error);
         tv_position = rootview.findViewById(R.id.tv_position);
+        ll_reply_to =rootview.findViewById(R.id.ll_reply_to);
         progressBar=rootview.findViewById(R.id.progressBar);
 
         tv_reply_to.setText(author);
@@ -68,17 +78,34 @@ public class PostPageDialog extends DialogFragment {
 
         tv_position.setText(String.format("[%d]",position));
 
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder
-                //.setTitle(getString(R.string.app_name))
-                .setCancelable(false)
-                .setView(rootview)
-                .setPositiveButton(R.string.reply, null)
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
+
+        if (isOnlyPreview){
+            ll_reply_to.setVisibility(View.GONE);
+            tv_text.setVisibility(View.GONE);
+            builder
+                    //.setTitle(getString(R.string.app_name))
+                    .setCancelable(false)
+                    .setView(rootview)
+                    .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+        } else {
+            builder
+                    //.setTitle(getString(R.string.app_name))
+                    .setCancelable(false)
+                    .setView(rootview)
+                    .setPositiveButton(R.string.reply, null)
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+        }
 
         return builder.create();
     }
@@ -100,6 +127,15 @@ public class PostPageDialog extends DialogFragment {
                 }
             }
         });
+
+        //выравниваем кнопку по центру
+        if (isOnlyPreview) {
+            Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); //create a new one
+            layoutParams.weight = 1.0f;
+            layoutParams.gravity = Gravity.CENTER; //this is layout_gravity
+            neutralButton.setLayoutParams(layoutParams);
+        }
     }
 
     @Override

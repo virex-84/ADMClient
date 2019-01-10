@@ -99,4 +99,7 @@ public class MyViewModel extends AndroidViewModel {
         return myRepository.countBookmarkedByForumAndTopic(forum_id,topic_id);
     }
 
+    public LiveData<Page> getPost(int forum_id, int topic_id, int id){
+        return myRepository.getPost(forum_id,topic_id,id);
+    }
 }

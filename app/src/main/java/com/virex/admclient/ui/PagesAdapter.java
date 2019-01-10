@@ -48,6 +48,7 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.ForumViewH
         void onQuoteClick(int position, Page page);
         void onLinkClick(String link);
         void onBookMarkClick(Page page, int position);
+        void onPreviewPostClick(int position);
     }
 
     public void markText(String text){
@@ -81,7 +82,7 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.ForumViewH
         final Page page = getItem(i);
         if (page != null) {
 
-            SpannableStringBuilder txt= (SpannableStringBuilder) Html.fromHtml(page.content, new Html.ImageGetter() {
+            SpannableStringBuilder txt= (SpannableStringBuilder) Html.fromHtml(Utils.createContentShortLinks(page.content), new Html.ImageGetter() {
                 @Override
                 public Drawable getDrawable(String source) {
                     //тут должна быть реализация загрузки изображения
@@ -126,9 +127,15 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.ForumViewH
                     int line = layout.getLineForVertical(y);
                     int off = layout.getOffsetForHorizontal(line, x);
 
-                    URLSpan[] link = buffer.getSpans(off, off, URLSpan.class);
-                    if (link.length != 0) {
-                        onItemClickListener.onLinkClick(link[0].getURL());
+                    URLSpan[] spanLink = buffer.getSpans(off, off, URLSpan.class);
+                    if (spanLink.length != 0) {
+                        String link=spanLink[0].getURL();
+                        //если кликнули на ссылке сформированной в Utils.createContentShortLinks
+                        if (link.contains("content:")){
+                            int position=Integer.parseInt(link.replace("content:",""));
+                            onItemClickListener.onPreviewPostClick(position);
+                        } else
+                            onItemClickListener.onLinkClick(link);
                     } else {
                         //т.к. TextView занимает бОльшую часть элемента recyclerview
                         //имитируем нажатие на элемент

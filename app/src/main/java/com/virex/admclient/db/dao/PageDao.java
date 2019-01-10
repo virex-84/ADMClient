@@ -47,5 +47,8 @@ public interface PageDao {
     LiveData<Integer> countBookmarkedByForumAndTopic(int forum_id, int topic_id);
 */
 
+    @Transaction
+    @Query("SELECT * FROM page WHERE forum_id==:forum_id and topic_id==:topic_id and num=:id")
+    LiveData<Page> getPage(int forum_id, int topic_id, int id);
 
 }

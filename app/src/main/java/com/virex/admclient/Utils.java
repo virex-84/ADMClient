@@ -260,4 +260,11 @@ public class Utils {
         } catch (Exception ignored) {
         }
     }
+
+    public static String createContentShortLinks(String source){
+        String regex = "(?<=\\[)(\\d+)(?=\\])";
+
+        //добавляем ссылку content:123
+        return source.replaceAll(regex, "<a href=\"content:$0\">$0</a>");
+    }
 }

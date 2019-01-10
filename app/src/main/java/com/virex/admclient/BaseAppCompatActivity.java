@@ -42,9 +42,13 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     int last_pref_colorPrimary=-1;
     public int colorAccent=-1;
 
+    AppCompatActivity self;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        self=this;
 
         options=PreferenceManager.getDefaultSharedPreferences(this);
 

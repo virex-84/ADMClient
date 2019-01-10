@@ -406,6 +406,10 @@ public class MyRepository {
         WorkManager.getInstance().beginUniqueWork("changePageBookmark",ExistingWorkPolicy.APPEND,simpleRequest).enqueue();
     }
 
+    public LiveData<Page> getPost(int forum_id, int topic_id, int id){
+        return database.pageDao().getPage(forum_id,topic_id,id);
+    }
+
 
     public void clearDataBase(){
         WorkManager.getInstance().cancelAllWork().addListener(new Runnable() {

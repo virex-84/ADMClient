@@ -196,6 +196,23 @@ public class PageActivity extends BaseAppCompatActivity {
                 savePositionPreference();
                 model.changePageBookmark(page);
             }
+
+            @Override
+            public void onPreviewPostClick(int position) {
+                model.getPost(forumID,topicID,position).observe(self, new Observer<Page>() {
+                    @Override
+                    public void onChanged(@Nullable Page page) {
+                        postPageDialog =new PostPageDialog(page.author, page.parcedContent.trim(), page.num, new PostPageDialog.OnDialogClickListener() {
+                            @Override
+                            public void onOkClick(String citate, String text) {
+                                postPageDialog.dismiss();
+                            }
+                        });
+                        postPageDialog.setOnlyPreview(true);
+                        postPageDialog.show(getSupportFragmentManager(), "preview");
+                    }
+                });
+            }
         });
 
         recyclerView.setAdapter(adapter);
