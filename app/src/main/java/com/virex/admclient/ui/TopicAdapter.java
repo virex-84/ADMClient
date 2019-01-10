@@ -1,28 +1,18 @@
 package com.virex.admclient.ui;
 
-import android.arch.paging.PagedList;
 import android.arch.paging.PagedListAdapter;
-import android.content.Context;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
-import android.text.Spannable;
+import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.virex.admclient.R;
 import com.virex.admclient.Utils;
@@ -72,7 +62,11 @@ public class TopicAdapter extends PagedListAdapter<Topic, TopicAdapter.TopicView
         if (topic != null) {
 
             topicViewHolder.tv_title.setText(topic.title);
-            topicViewHolder.tv_dsc.setText(topic.dsc);
+            if (topic.dsc!=null) {
+                topicViewHolder.tv_dsc.setText(Html.fromHtml(topic.dsc));
+            } else
+                topicViewHolder.tv_dsc.setText(null);
+
             if (topic.state.equals("closed")){
                 if(topic.isReaded){
                     topicViewHolder.img_isread.setImageResource(R.drawable.ic_lock_outline);
