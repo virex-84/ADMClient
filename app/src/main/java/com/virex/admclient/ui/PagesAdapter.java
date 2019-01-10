@@ -1,13 +1,10 @@
 package com.virex.admclient.ui;
 
 import android.arch.paging.PagedListAdapter;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 
-import android.text.Html;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -81,15 +78,8 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.ForumViewH
     public void onBindViewHolder(@NonNull ForumViewHolder forumViewHolder, final int i) {
         final Page page = getItem(i);
         if (page != null) {
-
-            SpannableStringBuilder txt= (SpannableStringBuilder) Html.fromHtml(Utils.createContentShortLinks(page.content), new Html.ImageGetter() {
-                @Override
-                public Drawable getDrawable(String source) {
-                    //тут должна быть реализация загрузки изображения
-                    //можно грузить например из assets или указать R.drawable.image
-                    return null;
-                }
-            }, null);
+            //переводим текст в разметку (включая линки вроде google.com - без указания http://)
+            SpannableStringBuilder txt=Utils.createSpannableContent(page.content);
 
             //при поиске - выделяем текст
             if (!TextUtils.isEmpty(markText) && !TextUtils.isEmpty(page.parcedContent)) {

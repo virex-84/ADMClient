@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Space;
 import android.widget.TextView;
 
 import com.virex.admclient.R;
@@ -46,7 +45,7 @@ public class PostPageDialog extends DialogFragment {
     public PostPageDialog(String author, String citate, int position, OnDialogClickListener onDialogClickListener){
         this.onDialogClickListener = onDialogClickListener;
         this.author=author;
-        this.citate=citate;
+        if (citate!=null) this.citate=Html.fromHtml(citate).toString().trim();
         this.position=position;
     }
 

@@ -149,7 +149,7 @@ public class PageActivity extends BaseAppCompatActivity {
                     showSnackBarInfo(recyclerView,getString(R.string.topic_is_closed),getString(R.string.ok));
                     return;
                 }
-                postPageDialog =new PostPageDialog(page.author, page.parcedContent.trim(), position, new PostPageDialog.OnDialogClickListener() {
+                postPageDialog =new PostPageDialog(page.author, page.content, position, new PostPageDialog.OnDialogClickListener() {
                     @Override
                     public void onOkClick(String citate, String text) {
                         postPageDialog.setStartLoading();
@@ -204,7 +204,7 @@ public class PageActivity extends BaseAppCompatActivity {
                     public void onChanged(@Nullable Page page) {
                         if (page==null) return;
 
-                        postPageDialog =new PostPageDialog(page.author, page.parcedContent.trim(), page.num, new PostPageDialog.OnDialogClickListener() {
+                        postPageDialog =new PostPageDialog(page.author, page.content, page.num, new PostPageDialog.OnDialogClickListener() {
                             @Override
                             public void onOkClick(String citate, String text) {
                                 postPageDialog.dismiss();

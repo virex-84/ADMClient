@@ -8,7 +8,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -17,19 +16,17 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatDelegate;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.util.Log;
+import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.util.TypedValue;
 import android.widget.TextView;
 
@@ -266,5 +263,27 @@ public class Utils {
 
         //добавляем ссылку content:123
         return source.replaceAll(regex, "<a href=\"content:$0\">$0</a>");
+    }
+
+    //добавляем в текст все ссылки (http:google.com и просто google.com)
+    public static SpannableStringBuilder createSpannableContent(String source){
+        SpannableStringBuilder txt= (SpannableStringBuilder) Html.fromHtml(Utils.createContentShortLinks(source), new Html.ImageGetter() {
+            @Override
+            public Drawable getDrawable(String source) {
+                //тут должна быть реализация загрузки изображения
+                //можно грузить например из assets или указать R.drawable.image
+                return null;
+            }
+        }, null);
+
+        URLSpan[] currentSpans = txt.getSpans(0, txt.length(), URLSpan.class);
+        SpannableStringBuilder buffer = new SpannableStringBuilder(txt);
+        Linkify.addLinks(buffer, Linkify.WEB_URLS);
+        for (URLSpan span : currentSpans) {
+            int end = txt.getSpanEnd(span);
+            int start = txt.getSpanStart(span);
+            buffer.setSpan(span, start, end, 0);
+        }
+        return buffer;
     }
 }

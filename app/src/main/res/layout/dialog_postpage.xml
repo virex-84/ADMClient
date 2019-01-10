@@ -57,7 +57,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="tv_citate"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                android:autoLink="web"
+                />
 
         </LinearLayout>
     </ScrollView>
