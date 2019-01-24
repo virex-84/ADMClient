@@ -15,7 +15,7 @@
         android:layout_marginTop="8dp"
         android:gravity="left"
         android:paddingRight="8dp"
-        android:text="tv_content"
+        tools:text="tv_content"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

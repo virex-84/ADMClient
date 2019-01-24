@@ -32,7 +32,7 @@ import com.virex.admclient.db.entity.Page;
 /**
  * Адаптер для отображения постов
  */
-public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.ForumViewHolder> {
+public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.PagesViewHolder> {
 
     OnItemClickListener onItemClickListener;
     String markText="";
@@ -69,13 +69,13 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.ForumViewH
 
     @NonNull
     @Override
-    public ForumViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public PagesViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.page_items, viewGroup, false);
-        return new ForumViewHolder(view);
+        return new PagesViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ForumViewHolder forumViewHolder, final int i) {
+    public void onBindViewHolder(@NonNull PagesViewHolder pagesViewHolder, final int i) {
         final Page page = getItem(i);
         if (page != null) {
             //переводим текст в разметку (включая линки вроде google.com - без указания http://)
@@ -89,16 +89,16 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.ForumViewH
                 Matcher match = word.matcher(page.parcedContent.toLowerCase());
 
                 while (match.find()) {
-                    //ForegroundColorSpan fcs = new ForegroundColorSpan(ContextCompat.getColor(forumViewHolder.itemView.getContext(), R.color.white));
+                    //ForegroundColorSpan fcs = new ForegroundColorSpan(ContextCompat.getColor(pagesViewHolder.itemView.getContext(), R.color.white));
                     ForegroundColorSpan fcs = new ForegroundColorSpan(foregroundColor);
-                    //BackgroundColorSpan bcs = new BackgroundColorSpan(ContextCompat.getColor(forumViewHolder.itemView.getContext(), R.color.colorPrimary));
+                    //BackgroundColorSpan bcs = new BackgroundColorSpan(ContextCompat.getColor(pagesViewHolder.itemView.getContext(), R.color.colorPrimary));
                     BackgroundColorSpan bcs = new BackgroundColorSpan(backgroundColor);
                     txt.setSpan(fcs, match.start(), match.end(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
                     txt.setSpan(bcs, match.start(), match.end(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
                 }
             }
-            forumViewHolder.tv_content.setText(txt);
-            forumViewHolder.tv_content.setMovementMethod(new LinkMovementMethod(){
+            pagesViewHolder.tv_content.setText(txt);
+            pagesViewHolder.tv_content.setMovementMethod(new LinkMovementMethod(){
                 @Override
                 public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
                     if (event.getAction() != MotionEvent.ACTION_UP)
@@ -134,19 +134,19 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.ForumViewH
                     return true;
                 }
             });
-            forumViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            pagesViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     onItemClickListener.onItemClick(i, page);
                 }
             });
-            forumViewHolder.btn_reply.setOnClickListener(new View.OnClickListener() {
+            pagesViewHolder.btn_reply.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     onItemClickListener.onReplyClick(i,page);
                 }
             });
-            forumViewHolder.btn_quote.setOnClickListener(new View.OnClickListener() {
+            pagesViewHolder.btn_quote.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     onItemClickListener.onQuoteClick(i,page);
@@ -154,35 +154,35 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.ForumViewH
             });
 
             if(page.isBookMark){
-                forumViewHolder.img_isBookMark.setImageResource(R.drawable.ic_bookmark);
-                //forumViewHolder.img_isBookMark.setBackgroundResource(R.drawable.ic_bookmark);
-                //forumViewHolder.img_isBookMark.setImageDrawable(ContextCompat.getDrawable(forumViewHolder.itemView.getContext(), R.drawable.ic_bookmark));
-                //forumViewHolder.img_isBookMark.setImageDrawable(ResourcesCompat.getDrawable(forumViewHolder.itemView.getContext().getResources(), R.drawable.ic_bookmark,null));
+                pagesViewHolder.img_isBookMark.setImageResource(R.drawable.ic_bookmark);
+                //pagesViewHolder.img_isBookMark.setBackgroundResource(R.drawable.ic_bookmark);
+                //pagesViewHolder.img_isBookMark.setImageDrawable(ContextCompat.getDrawable(pagesViewHolder.itemView.getContext(), R.drawable.ic_bookmark));
+                //pagesViewHolder.img_isBookMark.setImageDrawable(ResourcesCompat.getDrawable(pagesViewHolder.itemView.getContext().getResources(), R.drawable.ic_bookmark,null));
             } else {
-                forumViewHolder.img_isBookMark.setImageResource(R.drawable.ic_bookmark_border);
+                pagesViewHolder.img_isBookMark.setImageResource(R.drawable.ic_bookmark_border);
             }
-            //forumViewHolder.img_isBookMark.invalidate();
-            forumViewHolder.img_isBookMark.setOnClickListener(new View.OnClickListener() {
+            //pagesViewHolder.img_isBookMark.invalidate();
+            pagesViewHolder.img_isBookMark.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     onItemClickListener.onBookMarkClick(page, i);
                 }
             });
 
-            forumViewHolder.tv_num.setText(String.format("[%d]",page.num));
+            pagesViewHolder.tv_num.setText(String.format("[%d]",page.num));
         } else {
-            forumViewHolder.tv_content.setText("Loading ...");
-            forumViewHolder.tv_num.setText("[?]");
+            pagesViewHolder.tv_content.setText("Loading ...");
+            pagesViewHolder.tv_num.setText("[?]");
         }
     }
 
-    class ForumViewHolder extends RecyclerView.ViewHolder {
+    class PagesViewHolder extends RecyclerView.ViewHolder {
         TextView tv_content;
         Button btn_reply;
         Button btn_quote;
         ImageView img_isBookMark;
         TextView tv_num;
-        ForumViewHolder(@NonNull View itemView) {
+        PagesViewHolder(@NonNull View itemView) {
             super(itemView);
             tv_content = itemView.findViewById(R.id.tv_content);
             btn_reply = itemView.findViewById(R.id.btn_reply);
