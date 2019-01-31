@@ -1,5 +1,6 @@
 package com.virex.admclient;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.paging.PagedList;
@@ -59,6 +60,9 @@ public class PageActivity extends BaseAppCompatActivity {
     boolean postedNow=false;
 
     int lastcount=0;
+
+    LiveData<Page> previewPage;
+    Observer observer;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -199,7 +203,15 @@ public class PageActivity extends BaseAppCompatActivity {
 
             @Override
             public void onPreviewPostClick(int position) {
-                model.getPost(forumID,topicID,position).observe(self, new Observer<Page>() {
+                /*
+                фикс ушами
+                получаем данные от LiveData один раз и сразу же отписываемся,
+                что-бы при любом изменении данных (например bookmark)
+                заново не запустилось диалоговое окно
+                */
+
+                previewPage=model.getPost(forumID,topicID,position);
+                observer = new Observer<Page>(){
                     @Override
                     public void onChanged(@Nullable Page page) {
                         if (page==null) return;
@@ -212,9 +224,15 @@ public class PageActivity extends BaseAppCompatActivity {
                         });
                         postPageDialog.setOnlyPreview(true);
                         postPageDialog.show(getSupportFragmentManager(), "preview");
+
+                        //отписываемся
+                        previewPage.removeObserver(this);
                     }
-                });
+                };
+                //запускаем получение данных
+                previewPage.observe(PageActivity.this, observer);
             }
+
         });
 
         recyclerView.setAdapter(adapter);
