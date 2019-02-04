@@ -32,6 +32,7 @@
     <string name="pref_confirm_exit_dialog">Подтверждение при выходе</string>
     <string name="pref_confirm_exit_dialog_message">Cпрашивать в следующий раз подтверждение выхода из программы?</string>
     <string name="pref_confirm_update_bookmarked_topics">Обновлять отмеченные топики в фоновом режиме (каждые 15 минут)</string>
+    <string name="loading">Загрузка…</string>
 
     <string name="default_notification_channel_id">admclient_chanel</string>
     <string name="topic_is_closed">Ветка закрыта.</string>

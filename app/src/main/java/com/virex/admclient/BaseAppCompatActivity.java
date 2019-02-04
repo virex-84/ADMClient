@@ -39,16 +39,12 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     public boolean showGoUpDownMenuItem=false;
     public SharedPreferences options;
 
-    int last_pref_colorPrimary=-1;
+    boolean last_pref_set_dark_theme;
     public int colorAccent=-1;
-
-    AppCompatActivity self;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        self=this;
 
         options=PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -56,8 +52,7 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         Utils.setColoredTheme(this);
 
         colorAccent=Utils.getColorByAttributeId(this,R.attr.colorAccent);
-        last_pref_colorPrimary=colorAccent;
-
+        last_pref_set_dark_theme = options.getBoolean("pref_set_dark_theme", false);
     }
 
     //хитрый трюк: если цвет поменяли, а активити была неактивной - пересоздаем для применения темы
@@ -66,7 +61,9 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         int pref_colorPrimary = options.getInt("pref_colorPrimary", 0);
-        if (pref_colorPrimary !=0 && last_pref_colorPrimary!=pref_colorPrimary) {
+        boolean pref_set_dark_theme = options.getBoolean("pref_set_dark_theme", false);
+        //если основной цвет изменили, или поменяли тему "темная/светлая"
+        if ((pref_colorPrimary !=0 && colorAccent!=pref_colorPrimary) || last_pref_set_dark_theme!=pref_set_dark_theme) {
             recreate();
         }
     }
@@ -241,7 +238,7 @@ public class BaseAppCompatActivity extends AppCompatActivity {
                 .setAction(action_text, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //recucleview.smoothScrollToPosition(position); --если постов около 100 то это долго
+                        recucleview.stopScroll();
                         recucleview.scrollToPosition(position);
                         new Handler().postDelayed(new Runnable() {
                             @Override
