@@ -62,7 +62,7 @@ public class PageActivity extends BaseAppCompatActivity {
     int lastcount=0;
 
     LiveData<Page> previewPage;
-    Observer observer;
+    Observer<Page> observer;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -233,6 +233,27 @@ public class PageActivity extends BaseAppCompatActivity {
                 previewPage.observe(PageActivity.this, observer);
             }
 
+            //событие возникает когда адаптер полностью загрузил данные
+            @Override
+            public void onCurrentListLoaded() {
+                //восстанавливаем позицию
+                restorePositionPreference();
+                //fix повторяем восстановление позиции
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        restorePositionPreference();
+                        updateProgressBar();
+
+                        //если запостили - предлагаем перейти в последний пост
+                        if (postedNow){
+                            postedNow=false;
+                            snackbar=showSnackBarScroll(recyclerView,adapter.getItemCount() - 1,getString(R.string.action_scroll_to_post),getString(R.string.ok));
+                        }
+                    }
+                }, 1);
+            }
+
         });
 
         recyclerView.setAdapter(adapter);
@@ -267,6 +288,7 @@ public class PageActivity extends BaseAppCompatActivity {
             }
         });
 
+        //отфильтрованный список постов
         model.allPagesListFiltered(forumID,topicID,filter,isOnlyBookMark).observe(this, new Observer<PagedList<Page>>() {
             @Override
             public void onChanged(@Nullable final PagedList<Page> pages) {
@@ -277,6 +299,7 @@ public class PageActivity extends BaseAppCompatActivity {
                         model.setReadTopic(forumID,topicID, pages.size());
                 }
 
+                //загружаем данные в адаптер
                 adapter.submitList(pages);
 
                 if (pages == null) {
@@ -290,25 +313,10 @@ public class PageActivity extends BaseAppCompatActivity {
                     progressBarRead.setMax(pages.size()-1);
                 }
 
-                //возвращаем позицию после обновления данных (например после фильтра)
-                restorePositionPreference();
-                //небольшой "фикс"
-                //при загрузке данных, позиция уже на 100 посте и выше изменяется
-                //поэтому приходится еще раз вызвать восстановление позиции
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        restorePositionPreference();
-                        scrolltoLast();
-                        //fix при первом открытии activity ожидаем когда восстановится linearLayoutManager
-                        //и тогда можно определить прогресс
-                        updateProgressBar();
-                    }
-                }, 1);
-
             }
         });
 
+        //информация о топике
         model.getTopic(forumID,topicID).observe(this, new Observer<Topic>() {
             @Override
             public void onChanged(@Nullable Topic topic) {
@@ -356,6 +364,7 @@ public class PageActivity extends BaseAppCompatActivity {
 
     //восстанавливаем позицию при открытии Activity
     private void restorePositionPreference(){
+        recyclerView.stopScroll();
         SharedPreferences settings = getSharedPreferences(SHARED_OPTIONS, MODE_PRIVATE);
         String pos = settings.getString(SHARED_RECYCLER_POSITION, "");
         LinearLayoutManager.SavedState position =new Gson().fromJson(pos, LinearLayoutManager.SavedState.class);
@@ -384,15 +393,6 @@ public class PageActivity extends BaseAppCompatActivity {
         refreshDataSource();
     }
 
-    //после добавления поста, перемещаемся в самый низ
-    void scrolltoLast(){
-        if (postedNow && adapter.getItemCount()>0) {
-            postedNow=false;
-            //recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
-            linearLayoutManager.scrollToPositionWithOffset(adapter.getItemCount() - 1,0);
-        }
-    }
-
     //делаем цитату (обрамляем курсивом)
     String makeQuote(String quote, int position, String text){
         String quoteLines="";
@@ -413,6 +413,7 @@ public class PageActivity extends BaseAppCompatActivity {
 
     @Override
     public void onGoUp() {
+        recyclerView.stopScroll();
         linearLayoutManager.scrollToPositionWithOffset(0,0);
         //fix updateProgressBar не актуален, linearLayoutManager.findLastVisibleItemPosition() еще не знает об изменениях
         progressBarRead.setProgress(0);
@@ -420,6 +421,7 @@ public class PageActivity extends BaseAppCompatActivity {
 
     @Override
     public void onGoBottom() {
+        recyclerView.stopScroll();
         linearLayoutManager.scrollToPositionWithOffset(adapter.getItemCount() - 1,0);
         //fix updateProgressBar не актуален, linearLayoutManager.findLastVisibleItemPosition() еще не знает об изменениях
         progressBarRead.setProgress(adapter.getItemCount() - 1);

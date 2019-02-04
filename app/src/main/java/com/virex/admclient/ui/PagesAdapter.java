@@ -1,7 +1,9 @@
 package com.virex.admclient.ui;
 
+import android.arch.paging.PagedList;
 import android.arch.paging.PagedListAdapter;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 
@@ -46,6 +48,7 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.PagesViewH
         void onLinkClick(String link);
         void onBookMarkClick(Page page, int position);
         void onPreviewPostClick(int position);
+        void onCurrentListLoaded();
     }
 
     public void markText(String text){
@@ -55,6 +58,12 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.PagesViewH
     public PagesAdapter(DiffUtil.ItemCallback<Page> diffUtilCallback, @NonNull OnItemClickListener onItemClickListener) {
         super(diffUtilCallback);
         this.onItemClickListener=onItemClickListener;
+    }
+
+    @Override
+    public void onCurrentListChanged(@Nullable PagedList<Page> currentList) {
+        super.onCurrentListChanged(currentList);
+        onItemClickListener.onCurrentListLoaded();
     }
 
     public void setColors(int foregroundColor, int backgroundColor) {
@@ -171,7 +180,8 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.PagesViewH
 
             pagesViewHolder.tv_num.setText(String.format("[%d]",page.num));
         } else {
-            pagesViewHolder.tv_content.setText("Loading ...");
+            String loading=pagesViewHolder.tv_content.getResources().getString(R.string.loading);
+            pagesViewHolder.tv_content.setText(loading);
             pagesViewHolder.tv_num.setText("[?]");
         }
     }
