@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.virex.admclient.repository.MyRepository;
 
 import java.io.BufferedReader;
@@ -47,6 +49,8 @@ public class OptionsActivity extends AppCompatActivity
 
     public static class MyPreferenceFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener
     {
+
+        private String SHARED_OPTIONS_LIST_POSITION = "SHARED_OPTIONS_LIST_POSITION";
 
         @Override
         public void onCreatePreferences(Bundle bundle, String s) {
@@ -152,6 +156,14 @@ public class OptionsActivity extends AppCompatActivity
             super.onResume();
             // Set up a listener whenever a key changes
             getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+            //восстанавливаем положение списка
+            String pos = getPreferenceScreen().getSharedPreferences().getString(SHARED_OPTIONS_LIST_POSITION,"");
+            LinearLayoutManager.SavedState position =new Gson().fromJson(pos, LinearLayoutManager.SavedState.class);
+            try {
+                getListView().getLayoutManager().onRestoreInstanceState(position);
+            } catch (Exception ignore){
+            }
         }
 
         @Override
@@ -159,6 +171,13 @@ public class OptionsActivity extends AppCompatActivity
             super.onPause();
             // Set up a listener whenever a key changes
             getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+
+            //сохраняем позицию списка
+            try {
+                String pos=new Gson().toJson(getListView().getLayoutManager().onSaveInstanceState());
+                getPreferenceScreen().getSharedPreferences().edit().putString(SHARED_OPTIONS_LIST_POSITION, pos).apply();
+            } catch (Exception ignore){
+            }
         }
 
         @Override
