@@ -136,6 +136,9 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         searchView.setFocusable(true);
         searchView.requestFocusFromTouch();
 
+        //уведомляем потомков о том что начался поиск
+        onSearchBegin();
+
         //отслеживаем изменения текста в поисковом поле
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
@@ -267,6 +270,9 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     }
 
     //методы поиска, фильтрации (используются предками)
+    public void onSearchBegin(){
+    }
+
     public void onSearchTextSubmit(String query) {
     }
 

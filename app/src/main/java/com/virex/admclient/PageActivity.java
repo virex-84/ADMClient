@@ -380,6 +380,13 @@ public class PageActivity extends BaseAppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
+    //нажали меню ввода фильтра (поиск)
+    @Override
+    public void onSearchBegin() {
+        //сохраняем текущую позицию
+        savePositionPreference();
+    }
+
     //изменился текст поиска
     @Override
     public void onSearchTextChange(String query) {
