@@ -189,9 +189,12 @@ public class PageActivity extends BaseAppCompatActivity {
 
             @Override
             public void onLinkClick(String link) {
+                //переделываем старые ссылки
+                if (link.contains("www.delphimaster.ru")) link=link.replace("www.delphimaster.ru","forum.delphimaster.net");
+
                 //для "перемещенных" ссылок
-                if (link.contains("forum.pl?n=") && (!link.contains("http://delphimaster.ru/cgi-bin/"))) {
-                    link="http://delphimaster.ru/cgi-bin/".concat(link);
+                if ((link.contains("forum.pl?n=") || link.contains("anketa.pl?id=")) && (!link.contains("http://"))) {
+                    link="http://forum.delphimaster.net".concat(link);
                 }
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
                 startActivity(intent);

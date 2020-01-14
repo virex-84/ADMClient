@@ -22,7 +22,7 @@
     <string name="clear_database_dialog_message">Вы действительно хотите очистить базу?</string>
     <string name="about">О программе</string>
     <string name="app_crash_title">Упс… Что-то пошло не так…</string>
-    <string name="app_about">Мобильный клиент форума сайта\nwww.delphimaster.ru</string>
+    <string name="app_about">Мобильный клиент форума сайта\nforum.delphimaster.net</string>
     <string name="app_about_description">Пишите отзывы в Google Play\nhttps://play.google.com/store/apps/details?id=com.virex.admclient</string>
     <string name="input_title">Введите заголовок</string>
     <string name="input_text">Введите текст</string>

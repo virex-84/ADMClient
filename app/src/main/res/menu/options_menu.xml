@@ -20,12 +20,12 @@
         app:actionProviderClass="com.virex.admclient.ui.CheckBoxActionProvider"
         app:showAsAction="always"
 
-        android:title="" />
+        android:title="@null" />
     <item
         android:id="@+id/empty"
         android:icon="@drawable/ic_menu"
         android:orderInCategory="101"
-        android:title=""
+        android:title="@null"
         app:showAsAction="always">
         <menu>
 

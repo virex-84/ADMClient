@@ -22,7 +22,7 @@
     <string name="clear_database_dialog_message">Do you really want to clear the database?</string>
     <string name="about">About</string>
     <string name="app_crash_title">Oops… Something wrong…</string>
-    <string name="app_about">Mobile client\nwww.delphimaster.ru</string>
+    <string name="app_about">Mobile client\nforum.delphimaster.net</string>
     <string name="app_about_description">Write reviews on Google Play\nhttps://play.google.com/store/apps/details?id=com.virex.admclient</string>
     <string name="input_title">Input title</string>
     <string name="input_text">Input text</string>

@@ -211,9 +211,12 @@ public class TopicActivity extends BaseAppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         //сохраняем позицию списка
-        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT,recyclerView.getLayoutManager().onSaveInstanceState());
+        try {
+            super.onSaveInstanceState(outState);
+            outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
+        } catch(Exception e){
+        }
     }
 
     //обновление списка (указали фильтр)
