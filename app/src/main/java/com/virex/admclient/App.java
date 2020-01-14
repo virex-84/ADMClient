@@ -5,12 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatDelegate;
-import android.util.TypedValue;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,7 +20,6 @@ import com.virex.admclient.network.ForumWebService;
 import com.virex.admclient.network.PageWebService;
 import com.virex.admclient.network.TopicWebService;
 import com.virex.admclient.repository.PagesWorker;
-import com.virex.admclient.ui.MyResources;
 
 import androidx.work.Constraints;
 import androidx.work.Data;
@@ -97,7 +94,7 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
         OkHttpClient client = httpClient.build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://www.delphimaster.ru") //Базовая часть адреса
+                .baseUrl("http://forum.delphimaster.net/") //Базовая часть адреса
                 .addConverterFactory(GsonConverterFactory.create()) //Конвертер, необходимый для преобразования JSON'а в объекты при POST запросах
                 .client(client)
                 .build();
@@ -212,13 +209,12 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
 
         Throwable cause=exception.getCause();
         if(cause==null) cause=exception;
-        if(cause!=null) {
-            errorReport.append(extractSelfCause(cause,  "virex"));
-            errorReport.append(LINE_SEPARATOR);
 
-            errorReport.append(String.format("error=%s\n", cause.getLocalizedMessage()));
-            errorReport.append(LINE_SEPARATOR);
-        }
+        errorReport.append(extractSelfCause(cause,  "virex"));
+        errorReport.append(LINE_SEPARATOR);
+
+        errorReport.append(String.format("error=%s\n", cause.getLocalizedMessage()));
+        errorReport.append(LINE_SEPARATOR);
 
         errorReport.append("************ DEVICE INFORMATION ***********");
         errorReport.append(LINE_SEPARATOR);
@@ -257,13 +253,6 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
 
         if (key.equals("pref_set_dark_theme")) {
             boolean set_dark_theme = sharedPreferences.getBoolean(key, false);
-            /*
-            if (set_dark_theme){
-                setTheme(R.style.AppThemeDark);
-            } else {
-                setTheme(R.style.AppTheme);
-            }
-            */
             Utils.changeTheme(set_dark_theme);
         }
 

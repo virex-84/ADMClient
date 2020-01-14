@@ -4,10 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.appcompat.app.AlertDialog;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -18,6 +18,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.virex.admclient.R;
+
+import java.util.Locale;
 
 /**
  * Диалог добавления поста
@@ -37,10 +39,10 @@ public class PostPageDialog extends DialogFragment {
     private TextView tv_position;
     private LinearLayout ll_reply_to;
     private ProgressBar progressBar;
-    String author;
-    String citate;
-    int position;
-    boolean isOnlyPreview=false;
+    private String author;
+    private String citate;
+    private int position;
+    private boolean isOnlyPreview=false;
 
     public PostPageDialog(String author, String citate, int position, OnDialogClickListener onDialogClickListener){
         this.onDialogClickListener = onDialogClickListener;
@@ -75,7 +77,7 @@ public class PostPageDialog extends DialogFragment {
             }
         }
 
-        tv_position.setText(String.format("[%d]",position));
+        tv_position.setText(String.format(Locale.ENGLISH,"[%d]",position));
 
 
 

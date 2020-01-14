@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceFragmentCompat;
-import android.support.v7.widget.LinearLayoutManager;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ import com.virex.admclient.repository.MyRepository;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -58,18 +61,18 @@ public class OptionsActivity extends AppCompatActivity
         }
 
         @Override
-        public boolean onPreferenceTreeClick(android.support.v7.preference.Preference preference) {
+        public boolean onPreferenceTreeClick(androidx.preference.Preference preference) {
 
             //редактирование анкеты
             if (preference.getKey().equals("pref_edit_anketa")){
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.delphimaster.ru/anketa/index.html"));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://forum.delphimaster.net/anketa/index.html"));
                 startActivity(intent);
                 return false;
             }
 
             //очистка базы
             if (preference.getKey().equals("pref_dbclear")){
-                Context context = preference.getContext();
+                final Context context = preference.getContext();
                 Utils.setColoredTheme(context);
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
                 alertDialog
@@ -78,7 +81,7 @@ public class OptionsActivity extends AppCompatActivity
                         .setNegativeButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                MyRepository myRepository=new MyRepository(getActivity());
+                                MyRepository myRepository=new MyRepository(context);
                                 myRepository.clearDataBase();
 
                                 //очищаем историю активити, переходим в "корневой" - форумы
@@ -96,9 +99,9 @@ public class OptionsActivity extends AppCompatActivity
                 String login=URLEncodeString(pref_login);
                 String password=URLEncodeString(pref_password);
                 String edit=URLEncodeString("Редактировать");
-                ((App)getActivity().getApplication()).getAnketaApi().checkLogin(login,password,edit).enqueue(new Callback<ResponseBody>() {
+                App.getAnketaApi().checkLogin(login,password,edit).enqueue(new Callback<ResponseBody>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                         if (response.isSuccessful()) {
                             try {
                                 BufferedReader br = new BufferedReader(new InputStreamReader(response.body().byteStream(), "windows-1251"));
@@ -111,14 +114,14 @@ public class OptionsActivity extends AppCompatActivity
 
                                     if (!TextUtils.isEmpty(pre)){
                                         //ошибка
-                                        showToast(getActivity().getApplicationContext(), pre,false);
+                                        showToast(getContext(), pre,false);
                                         return;
                                     }
 
                                     if (!TextUtils.isEmpty(h4)){
                                         if (h4.toLowerCase().contains("Редактирование анкеты".toLowerCase())) {
                                             //зашли в редактирование
-                                            showToast(getActivity().getApplicationContext(), getString(R.string.check_login_sucess),true);
+                                            showToast(getContext(), getString(R.string.check_login_sucess),true);
                                             return;
                                         }
                                     }
@@ -136,14 +139,14 @@ public class OptionsActivity extends AppCompatActivity
                             }
                         } else {
                             String text= getString(R.string.check_login_failure);
-                            text=String.format("%s: [%d] %s",text,response.code(), response.message());
-                            showToast(getActivity().getApplicationContext(),text,false);
+                            text=String.format(Locale.ENGLISH,"%s: [%d] %s",text,response.code(), response.message());
+                            showToast(getContext(),text,false);
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        showToast(getActivity().getApplicationContext(), getString(R.string.check_login_failure),false);
+                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                        showToast(getContext(), getString(R.string.check_login_failure),false);
                     }
                 });
             }

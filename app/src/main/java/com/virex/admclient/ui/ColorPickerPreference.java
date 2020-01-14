@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.preference.PreferenceViewHolder;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.SeekBar;
@@ -16,7 +16,7 @@ import com.virex.admclient.R;
 import com.virex.admclient.Utils;
 
 
-public class ColorPickerPreference extends android.support.v7.preference.Preference implements SeekBar.OnSeekBarChangeListener {
+public class ColorPickerPreference extends androidx.preference.Preference implements SeekBar.OnSeekBarChangeListener {
 
     private int value;
     private ConstraintLayout color_picker_preview;

@@ -1,11 +1,11 @@
 package com.virex.admclient.ui;
 
-import android.arch.paging.PagedList;
-import android.arch.paging.PagedListAdapter;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.paging.PagedList;
+import androidx.paging.PagedListAdapter;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Layout;
 import android.text.Spannable;
@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,10 +37,10 @@ import com.virex.admclient.db.entity.Page;
  */
 public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.PagesViewHolder> {
 
-    OnItemClickListener onItemClickListener;
-    String markText="";
-    int foregroundColor=-1;
-    int backgroundColor=-1;
+    private OnItemClickListener onItemClickListener;
+    private String markText="";
+    private int foregroundColor=-1;
+    private int backgroundColor=-1;
 
     public interface OnItemClickListener {
         void onItemClick(int position, Page page);
@@ -178,7 +179,7 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.PagesViewH
                 }
             });
 
-            pagesViewHolder.tv_num.setText(String.format("[%d]",page.num));
+            pagesViewHolder.tv_num.setText(String.format(Locale.ENGLISH,"[%d]",page.num));
         } else {
             String loading=pagesViewHolder.tv_content.getResources().getString(R.string.loading);
             pagesViewHolder.tv_content.setText(loading);

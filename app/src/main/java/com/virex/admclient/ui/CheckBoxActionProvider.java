@@ -2,8 +2,7 @@ package com.virex.admclient.ui;
 
 import android.content.Context;
 
-import android.graphics.PorterDuff;
-import android.support.v4.view.ActionProvider;
+import androidx.core.view.ActionProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -26,9 +25,9 @@ public class CheckBoxActionProvider extends ActionProvider implements
      * @param context Context for accessing resources.
      */
 
-    OnClickListener onClickListener;
-    Context context;
-    CheckBox checkbox;
+    private OnClickListener onClickListener;
+    private Context context;
+    private CheckBox checkbox;
 
     public CheckBoxActionProvider(Context context) {
         super(context);

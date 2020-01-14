@@ -1,9 +1,9 @@
 package com.virex.admclient.db.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 
 /**
  * Описание таблицы Форум
@@ -26,7 +26,7 @@ public class Forum {
         @Override
         public boolean areContentsTheSame(@NonNull Forum oldItem, @NonNull Forum newItem) {
             //return oldItem.title.equals(newItem.title);
-            return oldItem.equals(newItem);
+            return oldItem.title.equals(newItem.title) && oldItem.dsc.equals(newItem.dsc);
         }
     };
 }

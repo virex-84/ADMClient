@@ -1,7 +1,7 @@
 package com.virex.admclient.repository;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.virex.admclient.App;
 import com.virex.admclient.Utils;
@@ -57,7 +57,7 @@ public class TopicsWorker extends Worker {
                 break;
         }
 
-        return Result.SUCCESS;
+        return Result.success();
     }
 
     private void loadFromNetwork(int forumID) {
@@ -79,7 +79,7 @@ public class TopicsWorker extends Worker {
                     upsertTopic(forumID, topic);//сам апи сайта не выдает номер конференции
 
                     //если воркера прерывали
-                    if (isCancelled()) return ;
+                    if (isStopped()) return ;
 
                     try {
                         //каждые 10 тем - позволяем базе данных "отобразить" в recucleview

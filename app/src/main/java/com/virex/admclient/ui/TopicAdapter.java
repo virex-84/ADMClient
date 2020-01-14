@@ -1,10 +1,10 @@
 package com.virex.admclient.ui;
 
-import android.arch.paging.PagedListAdapter;
+import androidx.paging.PagedListAdapter;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -18,16 +18,18 @@ import com.virex.admclient.R;
 import com.virex.admclient.Utils;
 import com.virex.admclient.db.entity.Topic;
 
+import java.util.Locale;
+
 /**
  * Адаптер для отображения топиков
  */
 public class TopicAdapter extends PagedListAdapter<Topic, TopicAdapter.TopicViewHolder> {
 
-    OnItemClickListener onItemClickListener;
-    String markText="";
-    int foregroundColor=-1;
-    int backgroundColor=-1;
-    int highLightedColor=-1;
+    private OnItemClickListener onItemClickListener;
+    private String markText="";
+    private int foregroundColor=-1;
+    private int backgroundColor=-1;
+    private int highLightedColor=-1;
 
     public interface OnItemClickListener {
         void onItemClick(View view, int position, Topic topic);
@@ -92,11 +94,11 @@ public class TopicAdapter extends PagedListAdapter<Topic, TopicAdapter.TopicView
             }
 
             //количество постов в топике
-            String count=String.format("%d", topic.count);
-            if (topic.count>topic.lastcount) count=String.format("%d(+%d)", topic.count, topic.count-topic.lastcount);
+            String count=String.format(Locale.ENGLISH,"%d", topic.count);
+            if (topic.count>topic.lastcount) count=String.format(Locale.ENGLISH,"%d(+%d)", topic.count, topic.count-topic.lastcount);
             topicViewHolder.tv_count.setText(count);
             //выделяем дополнительный текст
-            Utils.setHighLightedText(topicViewHolder.tv_count,String.format("+%d", topic.count-topic.lastcount),highLightedColor);
+            Utils.setHighLightedText(topicViewHolder.tv_count,String.format(Locale.ENGLISH,"+%d", topic.count-topic.lastcount),highLightedColor);
 
             topicViewHolder.tv_name.setText(topic.name);
             topicViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -119,7 +121,7 @@ public class TopicAdapter extends PagedListAdapter<Topic, TopicAdapter.TopicView
             });
 
         } else {
-            topicViewHolder.tv_title.setText("Loading ...");
+            topicViewHolder.tv_title.setText(topicViewHolder.tv_title.getContext().getString(R.string.loading));
             topicViewHolder.tv_dsc.setText("...");
         }
     }

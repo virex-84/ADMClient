@@ -1,10 +1,10 @@
 package com.virex.admclient;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.paging.PagedList;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.paging.PagedList;
+import androidx.annotation.NonNull;
 
 import com.virex.admclient.db.entity.Forum;
 import com.virex.admclient.db.entity.Page;

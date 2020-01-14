@@ -1,14 +1,14 @@
 package com.virex.admclient.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.paging.DataSource;
-import android.arch.paging.LivePagedListBuilder;
-import android.arch.paging.PagedList;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Observer;
+import androidx.paging.DataSource;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
@@ -412,7 +412,7 @@ public class MyRepository {
 
 
     public void clearDataBase(){
-        WorkManager.getInstance().cancelAllWork().addListener(new Runnable() {
+        WorkManager.getInstance().cancelAllWork().getResult().addListener(new Runnable() {
             @Override
             public void run() {
 

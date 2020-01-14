@@ -1,9 +1,9 @@
 package com.virex.admclient.ui;
 
-import android.arch.paging.PagedListAdapter;
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.paging.PagedListAdapter;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +17,7 @@ import com.virex.admclient.db.entity.Forum;
  */
 public class ForumAdapter extends PagedListAdapter<Forum, ForumAdapter.ForumViewHolder> {
 
-    OnItemClickListener onItemClickListener;
+    private OnItemClickListener onItemClickListener;
 
     public interface OnItemClickListener {
         void onItemClick(View view, int position, Forum forum);
@@ -55,8 +55,8 @@ public class ForumAdapter extends PagedListAdapter<Forum, ForumAdapter.ForumView
         TextView dsc;
         ForumViewHolder(@NonNull View itemView) {
             super(itemView);
-            title = (TextView) itemView.findViewById(R.id.tv_title);
-            dsc = (TextView) itemView.findViewById(R.id.tv_dsc);
+            title = itemView.findViewById(R.id.tv_title);
+            dsc = itemView.findViewById(R.id.tv_dsc);
         }
     }
 }

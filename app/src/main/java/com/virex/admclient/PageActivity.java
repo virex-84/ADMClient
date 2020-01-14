@@ -1,20 +1,20 @@
 package com.virex.admclient;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.arch.paging.PagedList;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PagedList;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -28,6 +28,8 @@ import com.virex.admclient.ui.PagesAdapter;
 import com.virex.admclient.ui.PostPageDialog;
 import com.virex.admclient.ui.SwipyRefreshLayout.SwipyRefreshLayout;
 import com.virex.admclient.ui.SwipyRefreshLayout.SwipyRefreshLayoutDirection;
+
+import java.util.Locale;
 
 /**
  * Активность списка постов
@@ -77,7 +79,7 @@ public class PageActivity extends BaseAppCompatActivity {
         forumID = getIntent().getIntExtra("n",-1);
         topicID = getIntent().getIntExtra("id",-1);
 
-        SHARED_OPTIONS=String.format("%s-%d-%d",PageActivity.class.getSimpleName(),forumID,topicID);
+        SHARED_OPTIONS=String.format(Locale.ENGLISH,"%s-%d-%d",PageActivity.class.getSimpleName(),forumID,topicID);
 
         model = ViewModelProviders.of(this).get(MyViewModel.class);
 
@@ -406,7 +408,7 @@ public class PageActivity extends BaseAppCompatActivity {
 
         for (String line: quote.split("\n")){
             if (quoteLines.isEmpty()){
-                quoteLines=quoteLines.concat("> ".concat(line).concat(String.format(" [%d]",position)).concat("\n"));
+                quoteLines=quoteLines.concat("> ".concat(line).concat(String.format(Locale.ENGLISH," [%d]",position)).concat("\n"));
             } else
                 quoteLines=quoteLines.concat("> ".concat(line).concat("\n"));
         }

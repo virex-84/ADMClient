@@ -1,20 +1,20 @@
 package com.virex.admclient;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.arch.paging.PagedList;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PagedList;
 import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
+import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -156,7 +156,7 @@ public class TopicActivity extends BaseAppCompatActivity {
         model.getForum(forumID).observe(this, new Observer<Forum>() {
             @Override
             public void onChanged(@Nullable Forum forum) {
-                setTitle(forum.title);
+                if (forum!=null) setTitle(forum.title);
             }
         });
 

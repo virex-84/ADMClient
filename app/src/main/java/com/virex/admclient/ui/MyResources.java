@@ -6,7 +6,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 

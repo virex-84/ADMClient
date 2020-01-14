@@ -1,21 +1,12 @@
 package com.virex.admclient.repository;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.media.RingtoneManager;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import android.text.Html;
-import android.util.Log;
 
 import com.virex.admclient.App;
-import com.virex.admclient.PageActivity;
-import com.virex.admclient.R;
 import com.virex.admclient.Utils;
 import com.virex.admclient.db.database.AppDataBase;
 import com.virex.admclient.db.entity.Page;
@@ -25,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -74,7 +66,7 @@ public class PagesWorker extends Worker {
                 break;
         }
 
-        return Result.SUCCESS;
+        return Result.success();
     }
 
     private int loadFromNetwork(int forumID, int topicID){
@@ -121,7 +113,7 @@ public class PagesWorker extends Worker {
                     }
 
                     //если воркера прерывали
-                    if (isCancelled()) return loadedCount;
+                    if (isStopped()) return loadedCount;
 
                     try {
                         //каждые 10 постов - позволяем базе данных "отобразить" в recucleview
@@ -161,7 +153,7 @@ public class PagesWorker extends Worker {
         for (Topic item: topics){
             int loadedCount=loadFromNetwork(item.n,item.id);
             if (loadedCount>0) {
-                Utils.sendNotification(getApplicationContext(),item.n,item.id,String.format("%d новых соообщений в %s",loadedCount,item.title));
+                Utils.sendNotification(getApplicationContext(),item.n,item.id,String.format(Locale.ENGLISH,"%d новых соообщений в %s",loadedCount,item.title));
             }
         }
 

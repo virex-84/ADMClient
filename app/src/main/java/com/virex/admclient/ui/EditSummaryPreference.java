@@ -2,7 +2,7 @@ package com.virex.admclient.ui;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
@@ -13,7 +13,7 @@ import com.virex.admclient.R;
  * позволяет отображать в комментарии содержимое, либо "пусто",
  * либо скрывать содержимое если это пароль
  */
-public class EditSummaryPreference extends android.support.v7.preference.EditTextPreference {
+public class EditSummaryPreference extends androidx.preference.EditTextPreference {
     private boolean isPassword=false;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
