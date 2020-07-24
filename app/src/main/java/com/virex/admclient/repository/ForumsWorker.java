@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import okhttp3.ResponseBody;
@@ -21,6 +22,8 @@ import retrofit2.Response;
  * "Воркер" для загрузки форумов в БД
  */
 public class ForumsWorker extends Worker {
+
+    public static final String EXTRA_RESULT = "result";
 
     private AppDataBase database = AppDataBase.getAppDatabase(getApplicationContext());
 
@@ -44,6 +47,11 @@ public class ForumsWorker extends Worker {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            Data result=new Data.Builder()
+                    .putString(ForumsWorker.EXTRA_RESULT,e.getMessage())
+                    .build();
+            return Result.failure(result);
+
         }
 
         return Result.success();

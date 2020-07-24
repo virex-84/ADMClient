@@ -29,6 +29,7 @@ import com.virex.admclient.network.PostBody;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -43,6 +44,7 @@ import static com.virex.admclient.Utils.URLEncodeString;
  */
 public class MyRepository {
 
+    private Context context;
     private AppDataBase database;
 
     //фильтрованный список постов
@@ -53,14 +55,30 @@ public class MyRepository {
     private MediatorLiveData<PagedList<Topic>> filteredTopics=new MediatorLiveData<>();
     private LiveData<PagedList<Topic>> topics;
 
+    //все сообщения
+    private MediatorLiveData<WorkInfo> messages=new MediatorLiveData<>();
+
+    Observer<WorkInfo> observer = new Observer<WorkInfo>() {
+        @Override
+        public void onChanged(WorkInfo workInfo) {
+            messages.setValue(workInfo);
+        }
+    };
+
 
     public MyRepository(Context context) {
         database = AppDataBase.getAppDatabase(context.getApplicationContext());
+        this.context=context;
+    }
+
+    public LiveData<WorkInfo> getAllMessages(){
+        return messages;
     }
 
     public void loadForumNetwork() {
         OneTimeWorkRequest simpleRequest = new OneTimeWorkRequest.Builder(ForumsWorker.class).build();
-        WorkManager.getInstance().beginUniqueWork("loadForumNetwork",ExistingWorkPolicy.REPLACE,simpleRequest).enqueue();
+        WorkManager.getInstance(context).beginUniqueWork("loadForumNetwork",ExistingWorkPolicy.REPLACE,simpleRequest).enqueue();
+        WorkManager.getInstance(context).getWorkInfoByIdLiveData(simpleRequest.getId()).observeForever(observer);
     }
 
     public LiveData<Forum> getForum(int forumID) {
@@ -173,6 +191,7 @@ public class MyRepository {
                 //.addTag("simple_work")
                 .build();
         WorkManager.getInstance().beginUniqueWork("loadTopicNetwork",ExistingWorkPolicy.REPLACE,simpleRequest).enqueue();
+        WorkManager.getInstance(context).getWorkInfoByIdLiveData(simpleRequest.getId()).observeForever(observer);
     }
 
     public LiveData<Topic> getTopic(int forumID, int topicID) {
@@ -389,6 +408,7 @@ public class MyRepository {
                 .build();
         //REPLACE - можно прервать загрузку
         WorkManager.getInstance().beginUniqueWork("loadPagesNetwork",ExistingWorkPolicy.REPLACE,simpleRequest).enqueue();
+        WorkManager.getInstance(context).getWorkInfoByIdLiveData(simpleRequest.getId()).observeForever(observer);
     }
 
     //пометить/снять флаг "вкладка"
