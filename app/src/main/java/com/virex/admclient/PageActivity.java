@@ -13,10 +13,16 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
+import androidx.work.WorkInfo;
+
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 
 import com.google.gson.Gson;
@@ -24,12 +30,16 @@ import com.google.gson.Gson;
 import com.virex.admclient.db.entity.Page;
 import com.virex.admclient.db.entity.Topic;
 import com.virex.admclient.network.PostBody;
+import com.virex.admclient.ui.FooterAdapter;
 import com.virex.admclient.ui.PagesAdapter;
 import com.virex.admclient.ui.PostPageDialog;
 import com.virex.admclient.ui.SwipyRefreshLayout.SwipyRefreshLayout;
 import com.virex.admclient.ui.SwipyRefreshLayout.SwipyRefreshLayoutDirection;
 
 import java.util.Locale;
+
+import static androidx.work.WorkInfo.State.*;
+import static com.virex.admclient.repository.ForumsWorker.EXTRA_RESULT;
 
 /**
  * Активность списка постов
@@ -45,10 +55,10 @@ public class PageActivity extends BaseAppCompatActivity {
     private SwipyRefreshLayout swipeRefreshLayout;
     private boolean topicIsClosed=false;
 
-    PagesAdapter adapter;
+    PagesAdapter pagesAdapter;
+    FooterAdapter footerAdapter;
     RecyclerView recyclerView;
     LinearLayoutManager linearLayoutManager;
-    ProgressBar progressBar;
     ProgressBar progressBarRead;
 
     private String SHARED_OPTIONS;//
@@ -83,7 +93,6 @@ public class PageActivity extends BaseAppCompatActivity {
 
         model = ViewModelProviders.of(this).get(MyViewModel.class);
 
-        progressBar = findViewById(R.id.progressBar);
         progressBarRead = findViewById(R.id.progressBarRead);
         recyclerView = findViewById(R.id.tv_recycler_view);
         linearLayoutManager=new LinearLayoutManager(this);
@@ -103,7 +112,7 @@ public class PageActivity extends BaseAppCompatActivity {
             }
         });
 
-        adapter = new PagesAdapter(Page.DIFF_CALLBACK, new PagesAdapter.OnItemClickListener() {
+        pagesAdapter = new PagesAdapter(Page.DIFF_CALLBACK, new PagesAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, Page page) {
 
@@ -253,16 +262,25 @@ public class PageActivity extends BaseAppCompatActivity {
                         //если запостили - предлагаем перейти в последний пост
                         if (postedNow){
                             postedNow=false;
-                            snackbar=showSnackBarScroll(recyclerView,adapter.getItemCount() - 1,getString(R.string.action_scroll_to_post),getString(R.string.ok));
+                            snackbar=showSnackBarScroll(recyclerView, pagesAdapter.getItemCount() - 1,getString(R.string.action_scroll_to_post),getString(R.string.ok));
                         }
                     }
                 }, 1);
             }
 
         });
+        pagesAdapter.setColors(getResources().getColor(R.color.white),colorAccent);
 
-        recyclerView.setAdapter(adapter);
-        adapter.setColors(getResources().getColor(R.color.white),colorAccent);
+        footerAdapter = new FooterAdapter(new FooterAdapter.OnItemClickListener() {
+            @Override
+            public void onReloadClick() {
+                swipeRefreshLayout.setRefreshing(false);
+                model.refreshPages(forumID,topicID);
+            }
+        });
+
+        ConcatAdapter concatAdapter=new ConcatAdapter(pagesAdapter,footerAdapter);
+        recyclerView.setAdapter(concatAdapter);
 
         recyclerView.clearAnimation();
         recyclerView.setItemAnimator(null);
@@ -291,6 +309,12 @@ public class PageActivity extends BaseAppCompatActivity {
                         break;
                 }
             }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                updateProgressBar();
+            }
         });
 
         //отфильтрованный список постов
@@ -305,18 +329,7 @@ public class PageActivity extends BaseAppCompatActivity {
                 }
 
                 //загружаем данные в адаптер
-                adapter.submitList(pages);
-
-                if (pages == null) {
-                    progressBar.setVisibility(View.VISIBLE);
-                } else {
-                    if (pages.size()>0){
-                        progressBar.setVisibility(View.GONE);
-                    } else
-                        progressBar.setVisibility(View.VISIBLE);
-
-                    progressBarRead.setMax(pages.size()-1);
-                }
+                pagesAdapter.submitList(pages);
 
             }
         });
@@ -347,6 +360,35 @@ public class PageActivity extends BaseAppCompatActivity {
                     if (topic.lastcount<topic.count) lastcount=topic.lastcount;
                     if ((topic.lastcount==topic.count) && (lastcount>0))
                         snackbar=showSnackBarScroll(recyclerView,lastcount+1,getString(R.string.action_scroll_to_post),getString(R.string.ok));
+
+                    //настраиваем прогресс-бар
+                    progressBarRead.setMax(topic.count);
+                }
+            }
+        });
+
+        model.getAllMessages().observe(this, new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(WorkInfo workInfo) {
+                if (workInfo!=null){
+                    if (workInfo.getState()==RUNNING || workInfo.getState()==ENQUEUED ){
+                        footerAdapter.setStatus(FooterAdapter.Status.LOADING,null);
+                    }
+
+                    if (workInfo.getState()==FAILED) {
+                        Data data = workInfo.getOutputData();
+                        if (data.getString(EXTRA_RESULT) != null) {
+                            footerAdapter.setStatus(FooterAdapter.Status.ERROR,workInfo.getOutputData().getString(EXTRA_RESULT));
+                            Toast.makeText(PageActivity.this, workInfo.getOutputData().getString(EXTRA_RESULT), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    if (workInfo.getState()==SUCCEEDED || workInfo.getState()==CANCELLED ){
+                        footerAdapter.setStatus(FooterAdapter.Status.SUCCESS,null);
+                    }
+
+                    if (pagesAdapter.getCurrentList()!=null && pagesAdapter.getCurrentList().size()==0)
+                        footerAdapter.setStatus(FooterAdapter.Status.MESSAGE,getString(R.string.list_is_empty));
                 }
             }
         });
@@ -380,9 +422,9 @@ public class PageActivity extends BaseAppCompatActivity {
     private void refreshDataSource(){
         model.setFilterPagesList(forumID,topicID,filter,isOnlyBookMark);
         //помечаем фильтр для выделения текста в адаптере
-        adapter.markText(filter);
+        pagesAdapter.markText(filter);
         //принудительная перерисовка recycleview
-        adapter.notifyDataSetChanged();
+        pagesAdapter.notifyDataSetChanged();
     }
 
     //нажали меню ввода фильтра (поиск)
@@ -434,8 +476,8 @@ public class PageActivity extends BaseAppCompatActivity {
     @Override
     public void onGoBottom() {
         recyclerView.stopScroll();
-        linearLayoutManager.scrollToPositionWithOffset(adapter.getItemCount() - 1,0);
+        linearLayoutManager.scrollToPositionWithOffset(pagesAdapter.getItemCount() - 1,0);
         //fix updateProgressBar не актуален, linearLayoutManager.findLastVisibleItemPosition() еще не знает об изменениях
-        progressBarRead.setProgress(adapter.getItemCount() - 1);
+        progressBarRead.setProgress(pagesAdapter.getItemCount() - 1);
     }
 }

@@ -8,12 +8,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.view.MenuItemCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,6 +57,7 @@ public class BaseAppCompatActivity extends AppCompatActivity {
 
         colorAccent=Utils.getColorByAttributeId(this,R.attr.colorAccent);
         last_pref_set_dark_theme = options.getBoolean("pref_set_dark_theme", false);
+
     }
 
     //хитрый трюк: если цвет поменяли, а активити была неактивной - пересоздаем для применения темы
@@ -298,5 +303,6 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         return res;
     }
     */
+
 
 }

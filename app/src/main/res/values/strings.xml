@@ -2,6 +2,7 @@
     <string name="app_name">ADMClient</string>
     <string name="reply">Reply</string>
     <string name="quote">Quote</string>
+    <string name="reload">Reload</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
@@ -18,6 +19,7 @@
     <string name="additionally">Additionally</string>
     <string name="options">Options</string>
     <string name="empty">empty</string>
+    <string name="list_is_empty">List is empty</string>
     <string name="exit_dialog_message">Do you really exit?</string>
     <string name="clear_database_dialog_message">Do you really want to clear the database?</string>
     <string name="about">About</string>

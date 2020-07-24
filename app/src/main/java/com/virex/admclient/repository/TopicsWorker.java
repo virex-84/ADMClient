@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import okhttp3.ResponseBody;
@@ -47,7 +48,9 @@ public class TopicsWorker extends Worker {
         int action=getInputData().getInt(EXTRA_ACTION,-1);
         switch(action){
             case ACTION_LOAD_FROM_NETWORK:
-                loadFromNetwork(forumID);
+                Data data=loadFromNetwork(forumID);
+                if (data!=null)
+                    return Result.failure(data);
                 break;
             case ACTION_SET_READ_TOPIC:
                 setReadTopic(forumID,topicID, count);
@@ -60,7 +63,7 @@ public class TopicsWorker extends Worker {
         return Result.success();
     }
 
-    private void loadFromNetwork(int forumID) {
+    private Data loadFromNetwork(int forumID) {
         int lastmod = -1;
 
         int count = database.topicDao().countByForum(forumID);
@@ -79,7 +82,7 @@ public class TopicsWorker extends Worker {
                     upsertTopic(forumID, topic);//сам апи сайта не выдает номер конференции
 
                     //если воркера прерывали
-                    if (isStopped()) return ;
+                    if (isStopped()) return null;
 
                     try {
                         //каждые 10 тем - позволяем базе данных "отобразить" в recucleview
@@ -93,7 +96,12 @@ public class TopicsWorker extends Worker {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            Data result=new Data.Builder()
+                    .putString(ForumsWorker.EXTRA_RESULT,e.getMessage())
+                    .build();
+            return result;
         }
+        return null;
     }
 
     private void setReadTopic(int forumID, int topicID, int count) {

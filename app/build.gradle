@@ -6,8 +6,8 @@ android {
         applicationId 'com.virex.admclient'
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 15
-        versionName "1.15"
+        versionCode 16
+        versionName "1.16"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,23 +28,23 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'androidx.room:room-runtime:2.2.3'
-    annotationProcessor 'androidx.room:room-compiler:2.2.3'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.room:room-runtime:2.2.5'
+    annotationProcessor 'androidx.room:room-compiler:2.2.5'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha05'
     implementation 'com.squareup.retrofit2:retrofit:2.6.2'      //свыше 2.6.2 - ошибка minmum API 24
     implementation 'com.squareup.retrofit2:converter-gson:2.6.2'//свыше 2.6.2 - ошибка minmum API 24
     //для POST
-    implementation 'androidx.paging:paging-runtime:2.1.1'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.1.0'
+    implementation 'androidx.paging:paging-runtime:2.1.2'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
     //java.lang.ClassCastException: java.util.ArrayList cannot be cast to android.arch.lifecycle.LiveData
     //implementation "android.arch.lifecycle:common-java8:1.1.1"
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0' //свыше 1.0.0 - чекбокс перестает работать
     //implementation 'com.github.orangegangsters:swipy:1.2.3'
 
     implementation 'androidx.preference:preference:1.1.0-alpha02' //свыше 1.1.0-alpha02 - чекбокс перестает работать
 
-    implementation 'androidx.work:work-runtime:2.2.0'
+    implementation 'androidx.work:work-runtime:2.4.0'
 }

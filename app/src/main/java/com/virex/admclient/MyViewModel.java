@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.paging.PagedList;
 import androidx.annotation.NonNull;
+import androidx.work.WorkInfo;
 
 import com.virex.admclient.db.entity.Forum;
 import com.virex.admclient.db.entity.Page;
@@ -21,6 +22,10 @@ public class MyViewModel extends AndroidViewModel {
     public MyViewModel(@NonNull Application application) {
         super(application);
         myRepository=new MyRepository(application);
+    }
+
+    public LiveData<WorkInfo> getAllMessages(){
+        return myRepository.getAllMessages();
     }
 
     //--------------------------------------------------------------------------

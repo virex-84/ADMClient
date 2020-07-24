@@ -11,7 +11,9 @@ import androidx.appcompat.app.AlertDialog;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -143,7 +145,14 @@ public class PostPageDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //сохраняем состояние при перевороте экрана
+        //setRetainInstance(true);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setRetainInstance(true);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -167,5 +176,8 @@ public class PostPageDialog extends DialogFragment {
         progressBar.setVisibility(View.GONE);
     }
 
-
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        setTargetFragment(null, -1);
+    }
 }
