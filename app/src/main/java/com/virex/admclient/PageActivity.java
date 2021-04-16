@@ -71,6 +71,9 @@ public class PageActivity extends BaseAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recycler_view_pages);
 
+        //очищаем счетчик непрочитанных сообщений
+        Utils.setBadge(getApplicationContext(),0);
+
         //отображаем меню поиска и фильтр по признаку "закладка"
         showSearchMenuItem=true;
         showBookmarkMenuItem=true;

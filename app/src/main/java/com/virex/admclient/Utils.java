@@ -5,17 +5,23 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
+import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
 import androidx.appcompat.app.AppCompatDelegate;
 import android.text.Html;
@@ -32,7 +38,11 @@ import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -169,7 +179,7 @@ public class Utils {
       Например: при нажатии на уведомление, переходим на список постов, если нажать "назад" -
       перейдём на список веток выбранного форума, еще раз "назад" - выходим в список форумов
      */
-    public static void sendNotification(Context context, int forumID, int topicID, String messageBody) {
+    public static void sendNotification(Context context, int forumID, int topicID, String messageBody, int count) {
         Intent intent = new Intent(context, PageActivity.class);
         intent.putExtra("n",forumID);
         intent.putExtra("id",topicID);
@@ -185,12 +195,7 @@ public class Utils {
         PendingIntent pendingIntent=stackBuilder.getPendingIntent(topicID,PendingIntent.FLAG_ONE_SHOT);
 
         String channelId = context.getString(R.string.default_notification_channel_id);
-        Notification.Builder notificationBuilder = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            notificationBuilder = new Notification.Builder(context, channelId);
-        } else {
-            notificationBuilder = new Notification.Builder(context);
-        }
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, channelId);
 
         notificationBuilder
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -198,17 +203,25 @@ public class Utils {
                 .setContentText(messageBody)
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL)
+                .setNumber(count);
+
+        Notification notification=notificationBuilder.build();
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager!=null) {
             //для android 8 и выше - обязательно
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(channelId, context.getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT);
+                channel.setShowBadge(true);
                 notificationManager.createNotificationChannel(channel);
             }
-            notificationManager.notify(topicID /* ID of notification */, notificationBuilder.build());
+            notificationManager.notify(topicID /* ID of notification */, notification);
         }
+
+        //setBadge(context,999999999);
+
         //Log.e("sendNotification","sendNotification");
     }
 
@@ -286,4 +299,157 @@ public class Utils {
         }
         return buffer;
     }
+
+    public static void setBadge(Context context, int count){
+        final String GOOGLE = "google";
+        final String HUAWEI = "huawei";
+        final String HONOR = "honor";
+        final String MEIZU = "meizu";
+        final String XIAOMI = "xiaomi";
+        final String OPPO = "oppo";
+        final String VIVO = "vivo";
+        final String SAMSUNG = "samsung";
+        final String UNKNOWN = "unknown";
+        final String SONY = "sony";
+        final String LG = "lg";
+        final String ZTE = "zte";
+        final String YANDEX = "yandex";
+        final String LENOVO = "lenovo";
+
+        String launcherClassName=context.getPackageManager().getLaunchIntentForPackage(context.getPackageName()).getComponent().getClassName();
+
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+        ComponentName componentName = launchIntent.getComponent();
+
+        Intent info = new Intent(Intent.ACTION_MAIN);
+        info.addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo resolveInfo = context.getPackageManager().resolveActivity(info, PackageManager.MATCH_DEFAULT_ONLY);
+        String launcherName = resolveInfo.activityInfo.packageName;
+
+        if (!TextUtils.isEmpty(Build.MANUFACTURER))
+        switch (Build.MANUFACTURER.toLowerCase()) {
+            case HONOR:
+            case HUAWEI:{
+                //проверка на наличие пакета
+                if (!Arrays.asList("com.huawei.android.launcher").contains(launcherName)) break;
+                Bundle bunlde = new Bundle();
+                bunlde.putString("package", context.getPackageName()); // com.test.badge is your package name
+                bunlde.putString("class", launcherClassName); // com.test. badge.MainActivity is your apk main activity
+                bunlde.putInt("badgenumber", count);
+                context.getContentResolver().call(Uri.parse("content://com.huawei.android.launcher.settings/badge/"), "change_badge", null, bunlde);
+            }
+            break;
+            case XIAOMI:{
+                //проверка на наличие пакета
+                if (!Arrays.asList("com.miui.miuilite",
+                        "com.miui.home",
+                        "com.miui.miuihome",
+                        "com.miui.miuihome2",
+                        "com.miui.mihome",
+                        "com.miui.mihome2",
+                        "com.i.miui.launcher").contains(launcherName)) break;
+                try {
+                    String channelId = context.getString(R.string.default_notification_channel_id);
+                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, channelId);
+
+                    notificationBuilder
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle(context.getString(R.string.app_name))
+                            //.setContentText(messageBody)
+                            .setAutoCancel(true)
+                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                            //.setContentIntent(pendingIntent)
+                            .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL)
+                            .setNumber(count);
+
+                    Notification notification=notificationBuilder.build();
+
+                    Field field = notification.getClass().getDeclaredField("extraNotification");
+                    Object extraNotification = field.get(notification);
+                    if (extraNotification != null) {
+                        Method method = extraNotification.getClass().getDeclaredMethod("setMessageCount", int.class);
+                        method.invoke(extraNotification, count);
+                        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        if (mNotificationManager != null) {
+                            mNotificationManager.notify(0, notification);
+                        }
+                    }
+                } catch (Exception e) {
+                    //throw new ShortcutBadgeException("not able to set badge", e);
+                }
+            }
+                break;
+            case VIVO:{
+                //проверка на наличие пакета
+                if (!Arrays.asList("com.vivo.launcher").contains(launcherName)) break;
+                Intent intent = new Intent("launcher.action.CHANGE_APPLICATION_NOTIFICATION_NUM");
+                intent.putExtra("packageName", context.getPackageName());
+                intent.putExtra("className", componentName.getPackageName());
+                intent.putExtra("notificationNum", count);
+                context.sendBroadcast(intent);
+            }
+                break;
+            case ZTE:{
+                Bundle extra = new Bundle();
+                extra.putInt("app_badge_count", count);
+                extra.putString("app_badge_component_name", componentName.flattenToString());
+                context.getContentResolver().call(Uri.parse("content://com.android.launcher3.cornermark.unreadbadge"),"setAppUnreadCount", null, extra);
+            }
+            break;
+            case OPPO:{
+                Bundle extras = new Bundle();
+                extras.putInt("app_badge_count", count);
+                context.getContentResolver().call(Uri.parse("content://com.android.badge/badge"), "setAppBadgeCount", null, extras);
+            }
+                break;
+            case MEIZU:
+                break;
+            case YANDEX:{
+                //проверка на наличие пакета
+                if (!Arrays.asList("com.yandex.launcher").contains(launcherName)) break;
+                Bundle extras = new Bundle();
+                extras.putString("class", componentName.getClassName());
+                extras.putString("package", componentName.getPackageName());
+                extras.putString("badges_count", String.valueOf(count));
+                context.getContentResolver().call(Uri.parse("content://com.yandex.launcher.badges_external"), "setBadgeNumber", null, extras);
+            }
+            break;
+            case SONY:{
+                //проверка на наличие пакета
+                if (!Arrays.asList("com.sonyericsson.home", "com.sonymobile.home").contains(launcherName)) break;
+                Intent intent = new Intent();
+                intent.setAction("com.sonyericsson.home.action.UPDATE_BADGE");
+                intent.putExtra("com.sonyericsson.home.intent.extra.badge.ACTIVITY_NAME", launcherClassName);
+                intent.putExtra("com.sonyericsson.home.intent.extra.badge.SHOW_MESSAGE", true);
+                intent.putExtra("com.sonyericsson.home.intent.extra.badge.MESSAGE", String.valueOf(count));
+                intent.putExtra("com.sonyericsson.home.intent.extra.badge.PACKAGE_NAME", context.getPackageName());
+                context.sendBroadcast(intent);
+            }
+                break;
+            case LENOVO:{
+                ArrayList<String> ids = new ArrayList<>();
+                Bundle extras = new Bundle();
+                extras.putStringArrayList("app_shortcut_custom_id", ids);
+                extras.putInt("app_badge_count", count);
+                context.getContentResolver().call(Uri.parse("content://com.android.badge/badge"), "setAppBadgeCount", null, extras);
+            }
+            break;
+            case UNKNOWN:
+            case SAMSUNG:
+            case LG:
+            case GOOGLE:{
+                //com.google.android.apps.nexuslauncher
+                Intent intent = new Intent("android.intent.action.BADGE_COUNT_UPDATE");
+                intent.putExtra("badge_count", count);
+                intent.putExtra("badge_count_package_name", context.getPackageName());
+                intent.putExtra("badge_count_class_name", launcherClassName);
+                context.sendBroadcast(intent);
+                break;
+            }
+
+            default:
+                ;//throw new Exception(NOT_SUPPORT_MANUFACTURER_ + Build.MANUFACTURER);
+        }
+    }
+
 }

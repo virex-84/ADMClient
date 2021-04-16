@@ -149,15 +149,18 @@ public class PagesWorker extends Worker {
 
     private void loadBookmarkedTopicsFromNetwork() {
 
+        int allCount=0;
         List<Topic> topics= database.topicDao().getBookmarkedTopics();
         for (Topic item: topics){
             int loadedCount=loadFromNetwork(item.n,item.id);
             if (loadedCount>0) {
-                Utils.sendNotification(getApplicationContext(),item.n,item.id,String.format(Locale.ENGLISH,"%d новых соообщений в %s",loadedCount,item.title));
+                //добавляем уведомление о не прочитанном топике
+                Utils.sendNotification(getApplicationContext(),item.n,item.id,String.format(Locale.ENGLISH,"%d новых соообщений в %s",loadedCount,item.title),loadedCount);
+                allCount+=loadedCount;
             }
         }
-
-        //Utils.sendNotification( getApplicationContext(),-1,-1,String.format("%d новых соообщений в %s",12,"item.title"));
+        //устанавливаем количество общее количество непрочитанных сообщений
+        Utils.setBadge(getApplicationContext(),allCount);
     }
 
 }
