@@ -6,24 +6,32 @@ import androidx.paging.PagedList;
 import android.content.Intent;
 import android.os.Parcelable;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
+import androidx.work.WorkInfo;
+
 import android.view.View;
-import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.virex.admclient.db.entity.Forum;
+import com.virex.admclient.ui.FooterAdapter;
 import com.virex.admclient.ui.ForumAdapter;
+
+import static androidx.work.WorkInfo.State.*;
+import static com.virex.admclient.repository.ForumsWorker.EXTRA_RESULT;
 
 /**
  * Активность списка форумов
  */
 public class ForumActivity extends BaseAppCompatActivity {
     RecyclerView recyclerView;
-    ProgressBar progressBar;
     SwipeRefreshLayout swipeRefreshLayout;
-    ForumAdapter adapter;
+    ForumAdapter forumAdapter;
+    FooterAdapter footerAdapter;
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "recycler_layout";
 
@@ -34,7 +42,6 @@ public class ForumActivity extends BaseAppCompatActivity {
 
         final MyViewModel model = ViewModelProviders.of(this).get(MyViewModel.class);
 
-        progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.tv_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         swipeRefreshLayout = findViewById(R.id.swipe_container);
@@ -48,7 +55,7 @@ public class ForumActivity extends BaseAppCompatActivity {
             }
         });
 
-        adapter = new ForumAdapter(Forum.DIFF_CALLBACK, new ForumAdapter.OnItemClickListener() {
+        forumAdapter = new ForumAdapter(Forum.DIFF_CALLBACK, new ForumAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position, Forum forum) {
                 Intent intent = new Intent(getBaseContext(), TopicActivity.class);
@@ -57,21 +64,21 @@ public class ForumActivity extends BaseAppCompatActivity {
             }
         });
 
-        recyclerView.setAdapter(adapter);
+        footerAdapter = new FooterAdapter(new FooterAdapter.OnItemClickListener() {
+            @Override
+            public void onReloadClick() {
+                swipeRefreshLayout.setRefreshing(false);
+                model.refreshForums();
+            }
+        });
+
+        ConcatAdapter concatAdapter=new ConcatAdapter(forumAdapter,footerAdapter);
+        recyclerView.setAdapter(concatAdapter);
 
         model.allForums().observe(this, new Observer<PagedList<Forum>>() {
             @Override
             public void onChanged(@Nullable PagedList<Forum> forums) {
-                adapter.submitList(forums);
-
-                if (forums == null) {
-                    progressBar.setVisibility(View.VISIBLE);
-                } else {
-                    if (forums.size()>0){
-                        progressBar.setVisibility(View.GONE);
-                    } else
-                        progressBar.setVisibility(View.VISIBLE);
-                }
+                forumAdapter.submitList(forums);
 
                 //восстанавливаем позицию списка
                 if (savedInstanceState != null) {
@@ -81,6 +88,30 @@ public class ForumActivity extends BaseAppCompatActivity {
                 }
             }
         });
+
+        model.getAllMessages().observe(this, new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(WorkInfo workInfo) {
+                if (workInfo!=null){
+                    if (workInfo.getState()==RUNNING || workInfo.getState()==ENQUEUED ){
+                        footerAdapter.setStatus(FooterAdapter.Status.LOADING,null);
+                    }
+
+                    if (workInfo.getState()==FAILED) {
+                        Data data = workInfo.getOutputData();
+                        if (data.getString(EXTRA_RESULT) != null) {
+                            footerAdapter.setStatus(FooterAdapter.Status.ERROR,workInfo.getOutputData().getString(EXTRA_RESULT));
+                            Toast.makeText(ForumActivity.this, workInfo.getOutputData().getString(EXTRA_RESULT), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    if (workInfo.getState()==SUCCEEDED || workInfo.getState()==CANCELLED ){
+                        footerAdapter.setStatus(FooterAdapter.Status.SUCCESS,null);
+                    }
+                }
+            }
+        });
+
     }
 
     @Override

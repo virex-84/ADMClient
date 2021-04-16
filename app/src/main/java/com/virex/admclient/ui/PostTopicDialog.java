@@ -10,7 +10,9 @@ import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import android.text.Html;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -90,7 +92,14 @@ public class PostTopicDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //сохраняем состояние при перевороте экрана
+        //setRetainInstance(true);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setRetainInstance(true);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -112,6 +121,11 @@ public class PostTopicDialog extends DialogFragment {
 
     public void setFinishLoading(){
         progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        setTargetFragment(null, -1);
     }
 
 }

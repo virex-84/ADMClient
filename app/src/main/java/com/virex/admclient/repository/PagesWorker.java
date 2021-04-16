@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import okhttp3.ResponseBody;
@@ -56,7 +57,15 @@ public class PagesWorker extends Worker {
         int action=getInputData().getInt(EXTRA_ACTION,-1);
         switch(action){
             case ACTION_LOAD_FROM_NETWORK:
-                loadFromNetwork(forumID, topicID);
+                try {
+                    loadFromNetwork(forumID, topicID);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Data result=new Data.Builder()
+                            .putString(ForumsWorker.EXTRA_RESULT,e.getMessage())
+                            .build();
+                    return Result.failure(result);
+                }
                 break;
             case ACTION_CHANGE_BOOKMARK:
                 changePageBookmark(forumID,topicID,pageID);
@@ -69,10 +78,10 @@ public class PagesWorker extends Worker {
         return Result.success();
     }
 
-    private int loadFromNetwork(int forumID, int topicID){
+    private int loadFromNetwork(int forumID, int topicID) throws IOException {
         int loadedCount=0;
         boolean isError=true;
-        try {
+        //try {
             int count = database.pageDao().countByForumAndTopic(forumID,topicID);
             //Response<ResponseBody> result=App.getPageApi().getPages(topicID,forumID,count,-1).execute();
             Response<ResponseBody> result=App.getPageApi().getPages2(topicID,forumID,count,-1).execute();
@@ -125,9 +134,9 @@ public class PagesWorker extends Worker {
                     cnt++;
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
         return loadedCount;
     }
 
@@ -152,7 +161,12 @@ public class PagesWorker extends Worker {
         int allCount=0;
         List<Topic> topics= database.topicDao().getBookmarkedTopics();
         for (Topic item: topics){
-            int loadedCount=loadFromNetwork(item.n,item.id);
+            int loadedCount= 0;
+            try {
+                loadedCount = loadFromNetwork(item.n,item.id);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if (loadedCount>0) {
                 //добавляем уведомление о не прочитанном топике
                 Utils.sendNotification(getApplicationContext(),item.n,item.id,String.format(Locale.ENGLISH,"%d новых соообщений в %s",loadedCount,item.title),loadedCount);

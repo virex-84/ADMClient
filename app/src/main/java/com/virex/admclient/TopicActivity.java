@@ -11,19 +11,28 @@ import android.os.Parcelable;
 import androidx.annotation.Nullable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
+import androidx.work.WorkInfo;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.virex.admclient.db.entity.Forum;
 import com.virex.admclient.db.entity.Topic;
 import com.virex.admclient.network.PostBody;
+import com.virex.admclient.ui.FooterAdapter;
 import com.virex.admclient.ui.PostTopicDialog;
 import com.virex.admclient.ui.TopicAdapter;
+
+import static androidx.work.WorkInfo.State.*;
+import static com.virex.admclient.repository.ForumsWorker.EXTRA_RESULT;
 
 /**
  * Активность списка топиков в выделенном форуме
@@ -34,10 +43,10 @@ public class TopicActivity extends BaseAppCompatActivity {
     private String filter="";
     int limit=-1;
 
-    ProgressBar progressBar;
     RecyclerView recyclerView;
     SwipeRefreshLayout swipeRefreshLayout;
-    TopicAdapter adapter;
+    TopicAdapter topicAdapter;
+    FooterAdapter footerAdapter;
     MyViewModel model;
     int forumID;
 
@@ -62,7 +71,6 @@ public class TopicActivity extends BaseAppCompatActivity {
 
         model = ViewModelProviders.of(this).get(MyViewModel.class);
 
-        progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.tv_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         swipeRefreshLayout = findViewById(R.id.swipe_container);
@@ -74,7 +82,7 @@ public class TopicActivity extends BaseAppCompatActivity {
             }
         });
 
-        adapter = new TopicAdapter(Topic.DIFF_CALLBACK, new TopicAdapter.OnItemClickListener() {
+        topicAdapter = new TopicAdapter(Topic.DIFF_CALLBACK, new TopicAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position, Topic topic) {
                 Intent intent = new Intent(getBaseContext(), PageActivity.class);
@@ -90,8 +98,8 @@ public class TopicActivity extends BaseAppCompatActivity {
                 самая актуальная информация - в адаптере
                  */
                 Topic current=topic;
-                if (adapter.getCurrentList()!=null) {
-                    for (Topic item : adapter.getCurrentList()) {
+                if (topicAdapter.getCurrentList()!=null) {
+                    for (Topic item : topicAdapter.getCurrentList()) {
                         if (item != null) {
                             if ((item.n == topic.n) && (item.id == topic.id)) {
                                 current = item;
@@ -119,9 +127,18 @@ public class TopicActivity extends BaseAppCompatActivity {
                     model.changeTopicBookmark(topic);
             }
         });
+        topicAdapter.setColors(getResources().getColor(R.color.white),colorAccent,colorAccent);
 
-        adapter.setColors(getResources().getColor(R.color.white),colorAccent,colorAccent);
-        recyclerView.setAdapter(adapter);
+        footerAdapter = new FooterAdapter(new FooterAdapter.OnItemClickListener() {
+            @Override
+            public void onReloadClick() {
+                swipeRefreshLayout.setRefreshing(false);
+                model.refreshTopics(forumID);
+            }
+        });
+
+        ConcatAdapter concatAdapter=new ConcatAdapter(topicAdapter,footerAdapter);
+        recyclerView.setAdapter(concatAdapter);
 
         String pref_topics_limit=options.getString("pref_topics_limit","-1");
         try {
@@ -131,16 +148,7 @@ public class TopicActivity extends BaseAppCompatActivity {
         model.allTopicsListFiltered(forumID,filter,isOnlyBookMark,limit).observe(this, new Observer<PagedList<Topic>>() {
             @Override
             public void onChanged(@Nullable PagedList<Topic> topics) {
-                adapter.submitList(topics);
-
-                if (topics == null) {
-                    progressBar.setVisibility(View.VISIBLE);
-                } else {
-                    if (topics.size()>0){
-                        progressBar.setVisibility(View.GONE);
-                    } else
-                        progressBar.setVisibility(View.VISIBLE);
-                }
+                topicAdapter.submitList(topics);
 
                 scrolltoFirst();
 
@@ -149,6 +157,32 @@ public class TopicActivity extends BaseAppCompatActivity {
                     Parcelable state = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
                     recyclerView.getLayoutManager().onRestoreInstanceState(state);
                     savedInstanceState.remove(BUNDLE_RECYCLER_LAYOUT);
+                }
+            }
+        });
+
+        model.getAllMessages().observe(this, new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(WorkInfo workInfo) {
+                if (workInfo!=null){
+                    if (workInfo.getState()==RUNNING || workInfo.getState()==ENQUEUED ){
+                        footerAdapter.setStatus(FooterAdapter.Status.LOADING,null);
+                    }
+
+                    if (workInfo.getState()==FAILED) {
+                        Data data = workInfo.getOutputData();
+                        if (data.getString(EXTRA_RESULT) != null) {
+                            footerAdapter.setStatus(FooterAdapter.Status.ERROR,workInfo.getOutputData().getString(EXTRA_RESULT));
+                            Toast.makeText(TopicActivity.this, workInfo.getOutputData().getString(EXTRA_RESULT), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    if (workInfo.getState()==SUCCEEDED || workInfo.getState()==CANCELLED ){
+                        footerAdapter.setStatus(FooterAdapter.Status.SUCCESS,null);
+
+                        if (topicAdapter.getCurrentList()!=null && topicAdapter.getCurrentList().size()==0)
+                            footerAdapter.setStatus(FooterAdapter.Status.MESSAGE,getString(R.string.list_is_empty));
+                    }
                 }
             }
         });
@@ -223,9 +257,9 @@ public class TopicActivity extends BaseAppCompatActivity {
     private void refreshDataSource(){
         model.setFilterTopicsList(forumID,filter,isOnlyBookMark, limit);
         //помечаем фильтр для выделения текста в адаптере
-        adapter.markText(filter);
+        topicAdapter.markText(filter);
         //принудительная перерисовка recycleview
-        adapter.notifyDataSetChanged();
+        topicAdapter.notifyDataSetChanged();
     }
 
     //изменился текст поиска
@@ -249,7 +283,7 @@ public class TopicActivity extends BaseAppCompatActivity {
 
     //скролл вверх
     void scrolltoFirst(){
-        if (postedNow && adapter.getItemCount()>0) {
+        if (postedNow && topicAdapter.getItemCount()>0) {
             postedNow=false;
             recyclerView.smoothScrollToPosition(0);
         }
