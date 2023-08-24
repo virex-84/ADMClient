@@ -192,10 +192,15 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
                     .setConstraints(constraints)
                     .build();
             //ExistingPeriodicWorkPolicy.REPLACE - можно прервать загрузку
-            WorkManager.getInstance().enqueueUniquePeriodicWork("loadBookmarkedTopicsFromNetwork", ExistingPeriodicWorkPolicy.REPLACE, periodicRequest);
+            WorkManager.getInstance(getApplicationContext()).enqueueUniquePeriodicWork("loadBookmarkedTopicsFromNetwork", ExistingPeriodicWorkPolicy.REPLACE, periodicRequest);
         } else {
-            WorkManager.getInstance().cancelAllWorkByTag("loadBookmarkedTopicsFromNetwork");
+            WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag("loadBookmarkedTopicsFromNetwork");
         }
+
+        //для теста
+        //Utils.sendNotification(getApplicationContext(),1,1,"ssd",12);
+        //Utils.setBadge(getApplicationContext(),999);
+
     }
 
     //выцепляем из всего стека записи о своих модулях (.java файлах)
