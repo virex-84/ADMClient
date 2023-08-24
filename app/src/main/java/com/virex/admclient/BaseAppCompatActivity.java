@@ -17,13 +17,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.virex.admclient.ui.CheckBoxActionProvider;
 import com.virex.admclient.ui.MyResources;
@@ -195,6 +198,23 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     public void onAboutItemClick(MenuItem item) {
         Intent intent = new Intent(this, AboutActivity.class);
         startActivity(intent);
+    }
+
+    public void onTermsUserItemClick(MenuItem item) {
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.terms_of_use, null);
+        TextView textView = layout.findViewById(R.id.message);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setView(layout)
+                .setCancelable(true)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        builder.create().show();
     }
 
     @Override

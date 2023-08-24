@@ -1,18 +1,22 @@
 package com.virex.admclient;
 
+import android.app.ActivityManager;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import com.virex.admclient.network.AnketaWebService;
@@ -20,6 +24,7 @@ import com.virex.admclient.network.ForumWebService;
 import com.virex.admclient.network.PageWebService;
 import com.virex.admclient.network.TopicWebService;
 import com.virex.admclient.repository.PagesWorker;
+import com.virex.admclient.ui.MyResources;
 
 import androidx.work.Constraints;
 import androidx.work.Data;
@@ -69,11 +74,39 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
         return anketaApi;
     }
 
-    Resources resources;
+    MyResources resources;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        String currentProcName = "";
+        int pid = android.os.Process.myPid();
+        ActivityManager manager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses())
+        {
+            if (processInfo.pid == pid)
+            {
+                currentProcName = processInfo.processName;
+                break;
+            }
+        }
+
+        //см. AndroidManifest         <activity
+        //            android:name=".AppCrashActivity"
+        //            android:process=":report_process"
+        if (currentProcName.contains(":report_process")) return;
+
+        //отлавливаем необработанные исключения
+        final Thread.UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable throwable) {
+                handleUncaughtException(thread, throwable);
+                handler.uncaughtException(thread, throwable);
+            }
+        });
+
 
         final String userAgent="ADMClient.".concat(BuildConfig.VERSION_NAME);
 
@@ -105,15 +138,6 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
         pageApi = retrofit.create(PageWebService.class);
         anketaApi = retrofit.create(AnketaWebService.class);
 
-        //отлавливаем необработанные исключения
-        final Thread.UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread thread, Throwable throwable) {
-                handleUncaughtException(thread, throwable);
-                handler.uncaughtException(thread, throwable);
-            }
-        });
 
         //инициализируем настройки
         options = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -126,7 +150,8 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
         boolean set_dark_theme = options.getBoolean("pref_set_dark_theme", false);
         Utils.changeTheme(set_dark_theme);
 
-        super.onCreate();
+        //test
+        //Utils.sendNotification(getApplicationContext(),1,1,String.format(Locale.ENGLISH,"%d новых соообщений в %s",10,"item.title"));
     }
 
     @Override
@@ -192,9 +217,7 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
         return result;
     }
 
-    //получаем текст ошибки и открываем новое активити
-    public void handleUncaughtException (Thread thread, Throwable exception)
-    {
+    private void handleUncaughtException(Thread thread, Throwable exception) {
         exception.printStackTrace();
 
         String LINE_SEPARATOR = "\n";
@@ -219,7 +242,7 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
         errorReport.append("************ DEVICE INFORMATION ***********");
         errorReport.append(LINE_SEPARATOR);
 
-        errorReport.append(String.format("Brand: %s\n",Build.BRAND));
+        errorReport.append(String.format("Brand: %s\n", Build.BRAND));
         errorReport.append(String.format("Device: %s\n",Build.DEVICE));
         errorReport.append(String.format("Model: %s\n",Build.MODEL));
         errorReport.append(String.format("ID: %s\n",Build.ID));
@@ -241,6 +264,7 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
         android.os.Process.killProcess(android.os.Process.myPid());
         System.exit(10);
     }
+
 
     //перехватываем изменение настроек
     @Override
@@ -275,7 +299,7 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
 
     }
 
-    /*
+
     @Override
     public Resources getResources() {
         //return super.getResources();
@@ -284,7 +308,7 @@ public class App extends Application implements SharedPreferences.OnSharedPrefer
         }
         return resources;
     }
-    */
+
 
 
 

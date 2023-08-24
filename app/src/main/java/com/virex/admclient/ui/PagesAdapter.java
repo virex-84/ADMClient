@@ -1,5 +1,7 @@
 package com.virex.admclient.ui;
 
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.text.PrecomputedTextCompat;
 import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ import android.widget.TextView;
 
 
 import java.util.Locale;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,7 +92,8 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.PagesViewH
         final Page page = getItem(i);
         if (page != null) {
             //переводим текст в разметку (включая линки вроде google.com - без указания http://)
-            SpannableStringBuilder txt=Utils.createSpannableContent(page.content);
+            //SpannableStringBuilder txt=Utils.createSpannableContent(page.content);
+            Future<PrecomputedTextCompat> txt= Utils.createSpannableContent(page.content,pagesViewHolder.tv_content.getTextMetricsParamsCompat());
 
             //при поиске - выделяем текст
             if (!TextUtils.isEmpty(markText) && !TextUtils.isEmpty(page.parcedContent)) {
@@ -103,11 +107,12 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.PagesViewH
                     ForegroundColorSpan fcs = new ForegroundColorSpan(foregroundColor);
                     //BackgroundColorSpan bcs = new BackgroundColorSpan(ContextCompat.getColor(pagesViewHolder.itemView.getContext(), R.color.colorPrimary));
                     BackgroundColorSpan bcs = new BackgroundColorSpan(backgroundColor);
-                    txt.setSpan(fcs, match.start(), match.end(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-                    txt.setSpan(bcs, match.start(), match.end(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    //txt.setSpan(fcs, match.start(), match.end(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    //txt.setSpan(bcs, match.start(), match.end(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
                 }
             }
-            pagesViewHolder.tv_content.setText(txt);
+            //pagesViewHolder.tv_content.setText(txt);
+            pagesViewHolder.tv_content.setTextFuture(txt);
             pagesViewHolder.tv_content.setMovementMethod(new LinkMovementMethod(){
                 @Override
                 public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
@@ -188,7 +193,7 @@ public class PagesAdapter extends PagedListAdapter<Page, PagesAdapter.PagesViewH
     }
 
     class PagesViewHolder extends RecyclerView.ViewHolder {
-        TextView tv_content;
+        AppCompatTextView tv_content;
         Button btn_reply;
         Button btn_quote;
         ImageView img_isBookMark;

@@ -62,7 +62,7 @@ public class PageActivity extends BaseAppCompatActivity {
     ProgressBar progressBarRead;
 
     private String SHARED_OPTIONS;//
-    private String SHARED_RECYCLER_POSITION = "SHARED_RECYCLER_POSITION";
+    private final String SHARED_RECYCLER_POSITION = "SHARED_RECYCLER_POSITION";
 
     PostPageDialog postPageDialog;
 

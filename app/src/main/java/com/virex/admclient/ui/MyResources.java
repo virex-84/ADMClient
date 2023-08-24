@@ -2,13 +2,18 @@ package com.virex.admclient.ui;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+
+import com.virex.admclient.R;
 
 public class MyResources extends Resources {
     /**
@@ -33,7 +38,8 @@ public class MyResources extends Resources {
     //не работает
     @Override
     public int getColor(int id, @Nullable Resources.Theme theme) throws NotFoundException {
-        switch (getResourceEntryName(id)) {
+        String op = getResourceEntryName(id);
+        switch (op) {
             case "colorPrimary":
                 // You can change the return value to an instance field that loads from SharedPreferences.
                 return Color.RED; // used as an example. Change as needed.
@@ -45,6 +51,11 @@ public class MyResources extends Resources {
         }
     }
 
+    @NonNull
+    @Override
+    public ColorStateList getColorStateList(int id, @Nullable Theme theme) throws NotFoundException {
+        return super.getColorStateList(id, theme);
+    }
 
     //нет colorPrimary
     @Override
@@ -52,14 +63,22 @@ public class MyResources extends Resources {
         //super.getValue(id, outValue, resolveRefs);
         String s=getResourceEntryName(id);
         switch (s) {
-            case "colorPrimary":
+            case "colorAccent":
                 // You can change the return value to an instance field that loads from SharedPreferences.
                 //return Color.RED; // used as an example. Change as needed.
+                super.getValue(R.color.white, outValue, resolveRefs);
             default:
                 super.getValue(id, outValue, resolveRefs);
         }
     }
 
+    @Override
+    public int getIdentifier(String name, String defType, String defPackage) {
+        return super.getIdentifier(name, defType, defPackage);
+    }
 
-
+    @Override
+    public String getResourceName(int resid) throws NotFoundException {
+        return super.getResourceName(resid);
+    }
 }

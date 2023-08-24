@@ -23,7 +23,9 @@
     <string name="exit_dialog_message">Do you really exit?</string>
     <string name="clear_database_dialog_message">Do you really want to clear the database?</string>
     <string name="about">About</string>
-    <string name="app_crash_title">Oops… Something wrong…</string>
+    <string name="app_crash_title">Oops, app crashed</string>
+    <string name="show_error">Show error</string>
+    <string name="app_crash_descr">We sincerely apologize for the software crash.</string>
     <string name="app_about">Mobile client\nforum.delphimaster.net</string>
     <string name="app_about_description">Write reviews on Google Play\nhttps://play.google.com/store/apps/details?id=com.virex.admclient</string>
     <string name="input_title">Input title</string>
@@ -50,6 +52,8 @@
 
     <string name="scroll_to_up">Scroll up</string>
     <string name="scroll_to_bottom">Scroll bottom</string>
+    <string name="terms_of_use">Use of this program assumes that you have read and accept: <a href="https://sites.google.com/view/admclient/privacypolicy">Privacy Policy</a></string>
+    <string name="menu_terms_of_use">Terms of Use</string>
 
     <string-array name="topic_limit">
         <item>@string/no_limit</item>

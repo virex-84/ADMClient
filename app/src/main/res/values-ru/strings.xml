@@ -23,7 +23,9 @@
     <string name="exit_dialog_message">Вы действительно хотите выйти?</string>
     <string name="clear_database_dialog_message">Вы действительно хотите очистить базу?</string>
     <string name="about">О программе</string>
-    <string name="app_crash_title">Упс… Что-то пошло не так…</string>
+    <string name="app_crash_title">Упс, приложение завершено с ошибкой</string>
+    <string name="show_error">Показать ошибку</string>
+    <string name="app_crash_descr">Приносим искренние извинения за сбой программы.</string>
     <string name="app_about">Мобильный клиент форума сайта\nforum.delphimaster.net</string>
     <string name="app_about_description">Пишите отзывы в Google Play\nhttps://play.google.com/store/apps/details?id=com.virex.admclient</string>
     <string name="input_title">Введите заголовок</string>
@@ -50,5 +52,7 @@
 
     <string name="scroll_to_up">Перейти в начало</string>
     <string name="scroll_to_bottom">Перейти к концу</string>
+    <string name="terms_of_use">Использование этой программы предполагает, что вы прочитали и принимаете: <a href="https://sites.google.com/view/admclient/privacypolicy">Политику конфиденциальности</a></string>
+    <string name="menu_terms_of_use">Условия использования</string>
 
 </resources>

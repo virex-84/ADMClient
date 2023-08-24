@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 33
     defaultConfig {
         applicationId 'com.virex.admclient'
         minSdkVersion 16
-        targetSdkVersion 29
-        versionCode 16
-        versionName "1.16"
+        targetSdkVersion 33
+        versionCode 19
+        versionName "1.20"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -19,6 +19,7 @@ android {
     }
     productFlavors {
     }
+    namespace 'com.virex.admclient'
 }
 
 dependencies {
@@ -46,5 +47,5 @@ dependencies {
 
     implementation 'androidx.preference:preference:1.1.0-alpha02' //свыше 1.1.0-alpha02 - чекбокс перестает работать
 
-    implementation 'androidx.work:work-runtime:2.4.0'
+    implementation 'androidx.work:work-runtime:2.7.1'
 }

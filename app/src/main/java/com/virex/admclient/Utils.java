@@ -5,19 +5,27 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.core.app.TaskStackBuilder;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.text.PrecomputedTextCompat;
+
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -32,7 +40,11 @@ import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URLEncoder;
+import java.util.List;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -170,19 +182,27 @@ public class Utils {
       перейдём на список веток выбранного форума, еще раз "назад" - выходим в список форумов
      */
     public static void sendNotification(Context context, int forumID, int topicID, String messageBody) {
-        Intent intent = new Intent(context, PageActivity.class);
-        intent.putExtra("n",forumID);
-        intent.putExtra("id",topicID);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-
         //создаем историю перехода: форумы->топики(+id форума в параметрах)->открываемый список постов
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         Intent activityForums = new Intent(context, ForumActivity.class);
-        Intent activityTopics = new Intent(context, TopicActivity.class);activityTopics.putExtra("n", forumID);
-        stackBuilder.addNextIntent(activityForums).addNextIntent(activityTopics).addNextIntent(intent);
+        Intent activityTopics = new Intent(context, TopicActivity.class);
+        activityTopics.putExtra("n", forumID);
+        Intent activityPost = new Intent(context, PageActivity.class);
+        activityPost.putExtra("n",forumID);
+        activityPost.putExtra("id",topicID);
+        activityPost.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        stackBuilder.addNextIntent(activityForums).addNextIntent(activityTopics).addNextIntent(activityPost);
 
         //обязательно необходимо указать recuestCode - что-бы система различала "нотификации"
-        PendingIntent pendingIntent=stackBuilder.getPendingIntent(topicID,PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = null;
+        //PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_ONE_SHOT);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE);
+        }
+        else
+        {
+            pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_ONE_SHOT);
+        }
 
         String channelId = context.getString(R.string.default_notification_channel_id);
         Notification.Builder notificationBuilder = null;
@@ -285,5 +305,158 @@ public class Utils {
             buffer.setSpan(span, start, end, 0);
         }
         return buffer;
+    }
+
+    public static  Future<PrecomputedTextCompat> createSpannableContent(String source,PrecomputedTextCompat.Params params){
+        SpannableStringBuilder ttt= (SpannableStringBuilder) Html.fromHtml(Utils.createContentShortLinks(source), new Html.ImageGetter() {
+            @Override
+            public Drawable getDrawable(String source) {
+                //тут должна быть реализация загрузки изображения
+                //можно грузить например из assets или указать R.drawable.image
+                return null;
+            }
+        }, null);
+
+        Future<PrecomputedTextCompat> txt = PrecomputedTextCompat.getTextFuture(ttt,params,null);
+
+        try {
+            URLSpan[] currentSpans = txt.get().getSpans(0, txt.get().length(), URLSpan.class);
+            SpannableStringBuilder buffer = new SpannableStringBuilder(txt.get());
+            Linkify.addLinks(buffer, Linkify.WEB_URLS);
+            for (URLSpan span : currentSpans) {
+                int end = txt.get().getSpanEnd(span);
+                int start = txt.get().getSpanStart(span);
+                //buffer.setSpan(span, start, end, 0);
+                txt.get().setSpan(span, start, end, 0);
+            }
+
+        }catch(Exception e){
+
+        }
+
+        return txt;
+    }
+
+    public static boolean canResolveBroadcast(Context context, Intent intent) {
+        PackageManager packageManager = context.getPackageManager();
+        List<ResolveInfo> receivers = packageManager.queryBroadcastReceivers(intent, 0);
+        return receivers != null && receivers.size() > 0;
+    }
+
+    public static void setBadge(Context context, Notification notification, int count){
+        final String GOOGLE = "google";
+        final String HUAWEI = "huawei";
+        final String MEIZU = "meizu";
+        final String XIAOMI = "xiaomi";
+        final String OPPO = "oppo";
+        final String VIVO = "vivo";
+        final String SAMSUNG = "samsung";
+        final String LG = "lg";
+        final String SONY = "sony";
+        final String HTC = "htc";
+        final String NOVA = "nova";
+
+        String launcherClassName = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName()).getComponent().getClassName();
+
+        if (!TextUtils.isEmpty(Build.MANUFACTURER))
+            switch (Build.MANUFACTURER.toLowerCase()) {
+                case HUAWEI:{
+                    Bundle bundle = new Bundle();
+                    bundle.putString("package", context.getPackageName()); // com.test.badge is your package name
+                    bundle.putString("class", launcherClassName); // com.test. badge.MainActivity is your apk main activity
+                    bundle.putInt("badgenumber", count);
+                    context.getContentResolver().call(Uri.parse("content://com.huawei.android.launcher.settings/badge/"), "change_badge", null, bundle);
+                }
+                break;
+                case XIAOMI:{
+                    NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    //Notification.Builder builder = new Notification.Builder(context).setContentTitle("title").setContentText("text").setSmallIcon(R.mipmap.ic_launcher);
+                    //Notification notification = builder.build();
+                    try {
+                        Field field = notification.getClass().getDeclaredField("extraNotification");
+                        Object extraNotification = field.get(notification);
+                        Method method = extraNotification.getClass().getDeclaredMethod("setMessageCount", int.class);
+                        method.invoke(extraNotification, count);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    mNotificationManager.notify(0, notification);
+                }
+                break;
+                case VIVO:
+                    break;
+                case OPPO:
+                    break;
+                case LG:
+                case SAMSUNG:{
+                    Intent intent = new Intent("android.intent.action.BADGE_COUNT_UPDATE");
+                    intent.putExtra("badge_count", count);
+                    intent.putExtra("badge_count_package_name", context.getPackageName());
+                    intent.putExtra("badge_count_class_name", launcherClassName);
+
+                    if (canResolveBroadcast(context, intent)) {
+                        context.sendBroadcast(intent);
+                    } else {
+                        //throw new Exception(UNABLE_TO_RESOLVE_INTENT_ERROR_ + intent.toString());
+                    }
+                }
+                break;
+                case MEIZU:
+                    break;
+                case SONY: {
+                    if (launcherClassName == null) {
+                        return;
+                    }
+                    Intent intent = new Intent();
+                    intent.setAction("com.sonyericsson.home.action.UPDATE_BADGE");
+                    intent.putExtra("com.sonyericsson.home.intent.extra.badge.SHOW_MESSAGE", true);
+                    intent.putExtra("com.sonyericsson.home.intent.extra.badge.ACTIVITY_NAME", launcherClassName);
+                    intent.putExtra("com.sonyericsson.home.intent.extra.badge.MESSAGE", String.valueOf(count));
+                    intent.putExtra("com.sonyericsson.home.intent.extra.badge.PACKAGE_NAME", context.getPackageName());
+                    context.sendBroadcast(intent);
+                }
+                    break;
+                case HTC:{
+                    Intent intent = new Intent("com.htc.launcher.action.SET_NOTIFICATION");
+                    ComponentName localComponentName = new ComponentName(context.getPackageName(), launcherClassName);
+                    intent.putExtra("com.htc.launcher.extra.COMPONENT", localComponentName.flattenToShortString());
+                    intent.putExtra("com.htc.launcher.extra.COUNT", count);
+                    context.sendBroadcast(intent);
+
+                    Intent intentShortcut = new Intent("com.htc.launcher.action.UPDATE_SHORTCUT");
+                    intentShortcut.putExtra("packagename", context.getPackageName());
+                    intentShortcut.putExtra("count", count);
+                    context.sendBroadcast(intentShortcut);
+                }
+                break;
+                case NOVA:{
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put("tag", context.getPackageName() + "/" + launcherClassName);
+                    contentValues.put("count", count);
+                    context.getContentResolver().insert(Uri.parse("content://com.teslacoilsw.notifier/unread_count"),contentValues);
+                }
+                break;
+                case "unknown":
+                case GOOGLE:{
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        Intent intent = new Intent("android.intent.action.BADGE_COUNT_UPDATE");
+                        intent.putExtra("badge_count", count);
+                        intent.putExtra("badge_count_package_name", context.getPackageName());
+                        intent.putExtra("badge_count_class_name", launcherClassName);
+                        context.sendBroadcast(intent);
+                    }
+                    break;
+                }
+
+                default:
+                    ;//throw new Exception(NOT_SUPPORT_MANUFACTURER_ + Build.MANUFACTURER);
+            }
+    }
+
+    public static void applyTheme(Context context, String colorTheme){
+        //берем из настроек и применяем
+        String pref_colorThemeString=PreferenceManager.getDefaultSharedPreferences(context).getString(colorTheme, "AppTheme");
+        //context.setTheme(context.getResources().getIdentifier(pref_colorThemeString, "style", context.getPackageName()));
+        context.getTheme().applyStyle(context.getResources().getIdentifier(pref_colorThemeString, "style", context.getPackageName()), true);
     }
 }

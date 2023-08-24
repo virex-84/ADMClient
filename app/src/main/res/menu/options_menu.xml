@@ -57,6 +57,13 @@
                 app:iconTint="?attr/colorPrimary"
                 android:title="@string/about"
                 app:showAsAction="ifRoom" />
+            <item
+                android:id="@+id/menu_terms_of_use"
+                android:icon="@drawable/ic_info"
+                android:onClick="onTermsUserItemClick"
+                app:iconTint="?attr/colorPrimary"
+                android:title="@string/menu_terms_of_use"
+                app:showAsAction="ifRoom" />
 
         </menu>
 
